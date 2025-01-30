@@ -1,0 +1,63 @@
+// //prisma/schema.prisma
+
+// generator client {
+//   provider = "prisma-client-js"
+// }
+
+// datasource db {
+//   provider = "postgresql"
+//   url      = env("DATABASE_URL")
+// }
+
+
+
+// model Pet {
+//   id       Int     @id @default(autoincrement())
+//   name     String
+//   age      Int
+//   category String
+//   breed    String
+//   state    String
+//   city     String
+//   contact  String
+//   image    String?
+//   userId   String  // Add this field to store Clerk user ID
+// }
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Pet {
+  id                Int                @id @default(autoincrement())
+  name              String
+  age               Int
+  category          String
+  breed             String
+  state             String
+  city              String
+  contact           String
+  image             String?
+  userId            String  // Store Clerk user ID
+  adoptionRequests  AdoptionRequest[]  // Inverse relation
+}
+
+model AdoptionRequest {
+  id            Int      @id @default(autoincrement())
+  petId         Int
+  adopterId     String
+  fullName      String
+  phoneNumber   String
+  emailAddress  String
+  residenceType String
+  location      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  pet Pet @relation(fields: [petId], references: [id])
+}
