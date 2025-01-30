@@ -29,17 +29,17 @@ const PetCard: React.FC<PetCardProps> = ({ name, age, category, breed, state, ci
         <p>Contact: {contact}</p>
         <div className="mt-4 text-center space-x-2">
           {onAdopt && (
-            <button onClick={onAdopt} className="px-4 py-2 bg-green-600 text-lg font-medium text-white rounded-lg">
+            <button onClick={onAdopt} className="px-4 py-2 bg-green-600 text-lg font-medium text-white rounded-lg hover:bg-green-700">
               Adopt
             </button>
           )}
           {onEdit && (
-            <button onClick={onEdit} className="px-4 py-2 bg-blue-600 text-lg font-medium text-white rounded-lg">
+            <button onClick={onEdit} className="px-4 py-2 bg-blue-600 text-lg font-medium text-white rounded-lg hover:bg-blue-700">
               Edit
             </button>
           )}
           {onDelete && (
-            <button onClick={onDelete} className="px-4 py-2 bg-red-600 text-lg font-medium text-white rounded-lg">
+            <button onClick={onDelete} className="px-4 py-2 bg-red-600 text-lg font-medium text-white rounded-lg hover:bg-red-700">
               Delete
             </button>
           )}

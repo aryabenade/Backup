@@ -1,4 +1,4 @@
-// // PetAdoptionForm component in app/adopt-a-pet/adopt/page.tsx
+// PetAdoptionForm component in app/adopt-a-pet/adopt/page.tsx
 "use client";
 
 import React, { useEffect, useState } from 'react';
@@ -53,6 +53,20 @@ const PetAdoptionForm: React.FC = () => {
       });
 
       if (response.ok) {
+        // Call the sendEmail API after the data is stored in the database
+        await fetch('/api/sendEmail', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            petId: parseInt(petId, 10),
+            fullName,
+            phoneNumber,
+            emailAddress,
+            residenceType,
+            location,
+          }),
+        });
+
         setFormSubmitted(true);
         setError(null);
         setTimeout(() => {

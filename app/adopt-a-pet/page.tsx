@@ -1,30 +1,31 @@
-// AdoptAPet component in app/adopt-a-pet/page.tsx
+// // AdoptAPet component in app/adopt-a-pet/page.tsx
 "use client";
 import React, { useEffect, useState } from 'react';
 import PetCard from '../components/PetCard';
 import Navbar from '../components/Navbar';
 import { Pet } from '../types';
 import { useUser } from '@clerk/nextjs';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 const AdoptAPet: React.FC = () => {
-  const [pets, setPets] = useState<Pet[]>([]);
   const { user } = useUser();
   const router = useRouter();
-
-  if (!user) {
-    redirect('/sign-in');
-  }
+  const [pets, setPets] = useState<Pet[]>([]);
 
   useEffect(() => {
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+
     const fetchPets = async () => {
       try {
         const response = await fetch('/api/pets');
         if (response.ok) {
           const data: Pet[] = await response.json();
-          console.log('User ID:', user?.id); // Log the user ID
+          console.log('User ID:', user.id); // Log the user ID
           console.log('All pets:', data); // Log all fetched pets
-          const otherPets = data.filter(pet => pet.userId !== user?.id); // Filter out pets posted by the logged-in user
+          const otherPets = data.filter(pet => pet.userId !== user.id); // Filter out pets posted by the logged-in user
           console.log('Filtered pets (not posted by user):', otherPets); // Log filtered pets
           setPets(otherPets);
         } else {
@@ -35,10 +36,8 @@ const AdoptAPet: React.FC = () => {
       }
     };
 
-    if (user?.id) {
-      fetchPets();
-    }
-  }, [user?.id]);
+    fetchPets();
+  }, [user, router]);
 
   const handleAdopt = (petId: number) => {
     router.push(`/adopt-a-pet/adopt?petId=${petId}`);

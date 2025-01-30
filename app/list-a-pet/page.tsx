@@ -5,26 +5,26 @@ import PetCard from '../components/PetCard';
 import Link from 'next/link';
 import { Pet } from '../types';
 import { useUser } from '@clerk/nextjs';
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
 
 const ListAPet: React.FC = () => {
-  const [pets, setPets] = useState<Pet[]>([]);
-  
   const { user } = useUser();
-    if (!user) {
-      redirect('/sign-in')
-    }
-
   const router = useRouter();
+  const [pets, setPets] = useState<Pet[]>([]);
 
   useEffect(() => {
+    if (!user) {
+      router.push('/sign-in');
+      return;
+    }
+
     const fetchUserPets = async () => {
       try {
         const response = await fetch('/api/pets');
         if (response.ok) {
           const data: Pet[] = await response.json();
-          const userPets = data.filter(pet => pet.userId === user?.id); // Filter pets by the logged-in user's ID
+          const userPets = data.filter(pet => pet.userId === user.id); // Filter pets by the logged-in user's ID
           setPets(userPets);
         } else {
           console.error('Failed to fetch pets');
@@ -35,7 +35,7 @@ const ListAPet: React.FC = () => {
     };
 
     fetchUserPets();
-  }, [user?.id]);
+  }, [user, router]);
 
   const handleEdit = (pet: Pet) => {
     // Navigate to the EditPetForm page with the pet ID
@@ -68,7 +68,7 @@ const ListAPet: React.FC = () => {
           Post your pet for adoption or browse through available pets.
         </p>
         <div className="flex justify-center mt-8">
-          <Link href="/list-a-pet/new" className="bg-blue-500 text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-blue-600">
+          <Link href="/list-a-pet/new" className="bg-blue-600 text-white px-6 py-3 rounded-md text-lg font-medium hover:bg-blue-700">
             Post a Pet for Adoption
           </Link>
         </div>
