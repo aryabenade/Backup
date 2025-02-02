@@ -29,9 +29,25 @@ const Pets: React.FC = () => {
     fetchPets();
   }, []);
 
+  const handleDeletePet = async (id?: number) => {
+    if (id) {
+      try {
+        await fetch('/api/deletePet', {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ id }),
+        });
+        setPets((prevPets) => prevPets.filter((pet) => pet.id !== id));
+      } catch (error) {
+        console.error('Error deleting pet:', error);
+      }
+    }
+  };
+
   return (
     <div>
-
       <h2 className="text-3xl font-bold mb-4">Pets</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {pets.map((pet) => (
@@ -46,8 +62,7 @@ const Pets: React.FC = () => {
             city={pet.city}
             contact={pet.contact}
             image={pet.image}
-            onEdit={() => console.log(`Edit pet ${pet.id}`)}
-            onDelete={() => console.log(`Delete pet ${pet.id}`)}
+            onDelete={() => handleDeletePet(pet.id)}
           />
         ))}
       </div>
