@@ -12,3 +12,39 @@ export interface Pet {
   image: string | null;
   userId: string; // Add this field
 }
+
+export interface GroomingBookingData {
+  id: number; // Add id field here
+  name: string;
+  email: string;
+  date: Date;
+  timeSlot: string;
+  petType: string;
+  petName: string;
+  petBreed: string;
+  petGender: string;
+  petSize: string;
+  petAggression: string;
+  petAge: string;
+  address: string;
+  packageTitle: string;
+  packageOriginalPrice: string;
+  status: string;
+}
+
+export interface NewGroomingBookingData {
+  name: string;
+  email: string;
+  date: Date;
+  timeSlot: string;
+  petType: string;
+  petName: string;
+  petBreed: string;
+  petGender: string;
+  petSize: string;
+  petAggression: string;
+  petAge: string;
+  address: string;
+  packageTitle: string;
+  packageOriginalPrice: string;
+}

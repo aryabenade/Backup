@@ -32,7 +32,7 @@ const GroomingCard: React.FC<GroomingPackageProps> = ({
           ))}
         </ul>
       </div>
-      <Link href="/services/grooming/form" passHref>
+      <Link href={`/services/grooming/form?title=${encodeURIComponent(title)}&originalPrice=${encodeURIComponent(originalPrice)}`} passHref>
         <button className="mt-6 w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition">
           Book A Groomer
         </button>

@@ -2,9 +2,12 @@
 "use client";
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { useRouter } from 'next/navigation';
+import { storeGroomingBooking } from '@/app/services/grooming/groomingBooking';
+import { NewGroomingBookingData } from '@/app/types'; 
 
 const GroomingBookingForm: React.FC = () => {
     const [name, setName] = useState('');
@@ -21,29 +24,54 @@ const GroomingBookingForm: React.FC = () => {
     const [address, setAddress] = useState('');
     const [formSubmitted, setFormSubmitted] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const title = searchParams?.get("title") || ''; 
+    const originalPrice = searchParams?.get("originalPrice") || ''; 
+
 
     const timeSlots = [
-        "08:00 AM - 10:00 AM",
         "10:00 AM - 12:00 PM",
         "12:00 PM - 02:00 PM",
         "02:00 PM - 04:00 PM",
         "04:00 PM - 06:00 PM",
-        "06:00 PM - 08:00 PM"
     ];
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (date && timeSlot) {
-            setFormSubmitted(true);
-
-            // Simulate form submission
-            setTimeout(() => {
-                // Redirect to grooming packages page after showing the message
-                router.push('/services/grooming');
-            }, 2000);
+            const newBooking: NewGroomingBookingData = {
+                name,
+                email,
+                date,
+                timeSlot,
+                petType,
+                petName,
+                petBreed,
+                petGender,
+                petSize,
+                petAggression,
+                petAge,
+                address,
+                packageTitle: title,
+                packageOriginalPrice: originalPrice
+            };
+    
+            try {
+                const response = await storeGroomingBooking(newBooking);
+    
+                if (response) {
+                    setFormSubmitted(true);
+                    setTimeout(() => {
+                        router.push('/services/grooming');
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('Error submitting form', error);
+            }
         }
     };
-
+    
     return (
         <div className="container mx-auto p-4">
             {formSubmitted ? (
@@ -62,6 +90,15 @@ const GroomingBookingForm: React.FC = () => {
                             <option value="Dog">Dog</option>
                         </select>
                     </div>
+
+                    {title && (
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700">Selected Package</label>
+                            <div className="mt-1 p-2 w-full border border-gray-300 rounded-md">
+                                {title} ({originalPrice})
+                            </div>
+                        </div>
+                    )}
 
                     <div className="mb-4">
                         <label htmlFor="petName" className="block text-sm font-medium text-gray-700">Name of your pet?</label>
