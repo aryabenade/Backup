@@ -28,7 +28,7 @@ export interface GroomingBookingData {
   petAge: string;
   address: string;
   packageTitle: string;
-  packageOriginalPrice: string;
+  packagePrice: string;
   status: string;
 }
 
@@ -46,5 +46,34 @@ export interface NewGroomingBookingData {
   petAge: string;
   address: string;
   packageTitle: string;
-  packageOriginalPrice: string;
+  packagePrice: string;
+}
+
+// Adding Vet Booking Interfaces
+export interface VetBookingData {
+  id: number;
+  name: string;
+  email: string;
+  date: Date;
+  timeSlot: string;
+  consultationType: string;
+  petType: string;
+  petIssues: string;
+  medicalAttention: string;
+  packageTitle: string;
+  packagePrice: string;
+  status: string;
+}
+
+export interface NewVetBookingData {
+  name: string;
+  email: string;
+  date: Date;
+  timeSlot: string;
+  consultationType: string;
+  petType: string;
+  petIssues: string[];
+  medicalAttention: string;
+  packageTitle: string;
+  packagePrice: string;
 }

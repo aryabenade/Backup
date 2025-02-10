@@ -27,7 +27,7 @@ const GroomingBookingForm: React.FC = () => {
     const searchParams = useSearchParams();
 
     const title = searchParams?.get("title") || ''; 
-    const originalPrice = searchParams?.get("originalPrice") || ''; 
+    const price = searchParams?.get("price") || ''; 
 
 
     const timeSlots = [
@@ -54,7 +54,7 @@ const GroomingBookingForm: React.FC = () => {
                 petAge,
                 address,
                 packageTitle: title,
-                packageOriginalPrice: originalPrice
+                packagePrice: price,
             };
     
             try {
@@ -95,7 +95,7 @@ const GroomingBookingForm: React.FC = () => {
                         <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700">Selected Package</label>
                             <div className="mt-1 p-2 w-full border border-gray-300 rounded-md">
-                                {title} ({originalPrice})
+                                {title} ({price})
                             </div>
                         </div>
                     )}

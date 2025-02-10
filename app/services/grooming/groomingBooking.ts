@@ -24,7 +24,7 @@ export async function storeGroomingBooking(data: NewGroomingBookingData): Promis
         petAge,
         address,
         packageTitle,
-        packageOriginalPrice
+        packagePrice
     } = data;
 
     try {
@@ -43,7 +43,7 @@ export async function storeGroomingBooking(data: NewGroomingBookingData): Promis
                 petAge,
                 address,
                 packageTitle,
-                packageOriginalPrice,
+                packagePrice,
                 status: 'Pending' // Default status
             }
         });

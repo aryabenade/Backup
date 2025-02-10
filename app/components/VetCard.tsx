@@ -1,3 +1,4 @@
+//app/components/VetCard.tsx
 import React from "react";
 import Link from "next/link";
 
@@ -30,7 +31,7 @@ const VetCard: React.FC<VetPackageProps> = ({
           ))}
         </ul>
       </div>
-      <Link href="/services/vet/form" passHref>
+      <Link href={`/services/vet/form?title=${encodeURIComponent(title)}&price=${encodeURIComponent(price)}`} passHref>
         <button className="mt-6 w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition">
           Book A Vet
         </button>

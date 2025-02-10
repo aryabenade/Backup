@@ -1,10 +1,13 @@
-// //VetBookingForm in app/services/vet/form/page.tsx
+ //VetBookingForm in app/services/vet/form/page.tsx
 "use client";
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
-import { useRouter } from 'next/navigation';
+import { storeVetBooking } from '@/app/services/vet/vetBooking';
+import { NewVetBookingData } from '@/app/types';
 
 const VetBookingForm: React.FC = () => {
     const [name, setName] = useState('');
@@ -17,6 +20,10 @@ const VetBookingForm: React.FC = () => {
     const [medicalAttention, setMedicalAttention] = useState('');
     const [formSubmitted, setFormSubmitted] = useState(false);
     const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const title = searchParams?.get("title") || ''; 
+    const price = searchParams?.get("price") || ''; 
 
     const petIssuesOptions = [
         "General Medical Question",
@@ -31,12 +38,10 @@ const VetBookingForm: React.FC = () => {
     ];
 
     const timeSlots = [
-        "08:00 AM - 10:00 AM",
         "10:00 AM - 12:00 PM",
         "12:00 PM - 02:00 PM",
         "02:00 PM - 04:00 PM",
         "04:00 PM - 06:00 PM",
-        "06:00 PM - 08:00 PM"
     ];
 
     const handleIssueChange = (issue: string) => {
@@ -47,16 +52,34 @@ const VetBookingForm: React.FC = () => {
         );
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (date && timeSlot) {
-            setFormSubmitted(true);
-
-            // Simulate form submission
-            setTimeout(() => {
-                // Redirect to vet packages page after showing the message
-                router.push('/services/vet');
-            }, 2000);
+            const newBooking: NewVetBookingData = {
+                name,
+                email,
+                date,
+                timeSlot,
+                consultationType,
+                petType,
+                petIssues,
+                medicalAttention,
+                packageTitle: title,
+                packagePrice: price,
+            };
+    
+            try {
+                const response = await storeVetBooking(newBooking);
+    
+                if (response) {
+                    setFormSubmitted(true);
+                    setTimeout(() => {
+                        router.push('/services/vet');
+                    }, 2000);
+                }
+            } catch (error) {
+                console.error('Error submitting form', error);
+            }
         }
     };
 
@@ -98,6 +121,15 @@ const VetBookingForm: React.FC = () => {
                             <label htmlFor="onlineConsultation" className="ml-2 text-sm text-gray-700">Online Consultation</label>
                         </div>
                     </div>
+
+                    {title && (
+                        <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700">Selected Package</label>
+                            <div className="mt-1 p-2 w-full border border-gray-300 rounded-md">
+                                {title} ({price})
+                            </div>
+                        </div>
+                    )}
 
                     <div className="mb-4">
                         <label htmlFor="petType" className="block text-sm font-medium text-gray-700">What type of pet?</label>
