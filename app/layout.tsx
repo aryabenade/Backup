@@ -4,6 +4,7 @@ import {
   ClerkProvider,
 } from '@clerk/nextjs'
 import React, { ReactNode } from 'react';
+import { Toaster } from 'react-hot-toast';
 import './styles/globals.css';
 
 interface LayoutProps {
