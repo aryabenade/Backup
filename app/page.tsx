@@ -7,7 +7,7 @@ const Home: React.FC = () => {
   return (
     <div>
         <Navbar />
-      <div className="container mx-auto p-4">
+      <div className="container mx-auto p-4 min-h-screen">
         <h1 className="text-4xl font-bold text-center mt-10">
           Welcome to Pet Care and Adoption Platform
         </h1>

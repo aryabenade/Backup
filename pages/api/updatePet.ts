@@ -7,15 +7,15 @@ const prisma = new PrismaClient();
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'PUT') {
     // Handle updating a pet
-    const { id, name, age, category, breed, state, city, contact, image } = req.body;
+    const { id, name, age, petType, petBreed, state, city, contact, image } = req.body;
     try {
       const pet = await prisma.pet.update({
         where: { id: parseInt(id, 10) },
         data: {
           name,
           age: parseInt(age, 10),
-          category,
-          breed,
+          petType,
+          petBreed,
           state,
           city,
           contact,

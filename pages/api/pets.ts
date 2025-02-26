@@ -1,3 +1,4 @@
+
 // pages/api/pets.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
@@ -6,14 +7,15 @@ const prisma = new PrismaClient();
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { name, age, category, breed, state, city, contact, image, userId } = req.body;
+    const { name, age, ageUnit, petType, petBreed, state, city, contact, image, userId } = req.body;
     try {
       const pet = await prisma.pet.create({
         data: {
           name,
           age: parseInt(age, 10),
-          category,
-          breed,
+          ageUnit,
+          petType,
+          petBreed,
           state,
           city,
           contact,

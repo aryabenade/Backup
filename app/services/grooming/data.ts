@@ -1,3 +1,4 @@
+//app/services/grooming/data.ts
 export const dogPackages = [
     {
       title: "Spa Bath",
@@ -34,7 +35,7 @@ export const dogPackages = [
       title: "Full Service",
       price: "₹1999",
       originalPrice: "₹2398",
-      features: [
+      features: [ 
         "Bath With Shampoo & Conditioner",
         "Blow Dry",
         "Full Body Trimming/Zero Haircut",

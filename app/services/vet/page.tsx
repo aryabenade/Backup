@@ -1,7 +1,7 @@
 // //VetPage in app/services/vet/page.tsx
 import React from "react";
 import { onlineVetPackages, inPersonVetPackages } from "../vet/data";
-import VetCard from '../../components/VetCard'
+import VetCard from './VetCard'
 
 const VetPackages = () => {
   return (

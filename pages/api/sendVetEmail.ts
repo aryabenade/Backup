@@ -1,3 +1,4 @@
+
 // Path: pages/api/sendVetEmail.ts
 import { NextApiRequest, NextApiResponse } from 'next';
 import { PrismaClient } from '@prisma/client';
@@ -15,7 +16,7 @@ const transporter = nodemailer.createTransport({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { bookingId, status, executiveDetails } = req.body;
+    const { bookingId } = req.body;
     try {
       const booking = await prisma.vetBooking.findUnique({
         where: { id: bookingId },
@@ -25,9 +26,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         return res.status(404).json({ error: 'Booking not found' });
       }
 
-      let message;
-      if (status === 'Approved') {
-        message = `
+     
+       const message = `
         <p>Your vet consultation booking for <strong>${booking.petType}</strong> has been <strong>approved</strong>!</p>
         <h3>Booking Details:</h3>
         <ul>
@@ -48,29 +48,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         </ul>
         <p>If you have any questions or need further assistance, please contact us at <strong>7710986068</strong>. Thank you for choosing our vet consultation service!</p>
         `;
-      } else {
-        message = `
-        <p>We regret to inform you that your vet consultation booking for <strong>${booking.petType}</strong> has been <strong>rejected</strong>.</p>
-        <h3>Possible Reasons for Rejection:</h3>
-        <ul>
-          <li>The booking form was not filled out properly with the correct details.</li>
-          <li>Our service is currently unavailable in your area.</li>
-          <li>All our vet executives are fully booked at the moment.</li>
-        </ul>
-        <h3>What You Can Do:</h3>
-        <ul>
-          <li>Review the booking details and make sure all information is accurate.</li>
-          <li>Check back later for availability in your area.</li>
-          <li>Contact our support team for assistance or to explore alternative options.</li>
-        </ul>
-        <p>If you have any questions or need further assistance, please contact us at <strong>7710986068</strong>. We apologize for any inconvenience caused and hope to serve you and your pet in the future.</p>
-        `;
-      }
-
+      
       const mailOptions = {
         from: 'testingforarya@gmail.com', // Your email
         to: booking.email, // Send email to the user's email
-        subject: `Vet Consultation Booking ${status}`,
+        subject: `Vet Consultation Booking Confirmed`,
         html: message,
       };
 

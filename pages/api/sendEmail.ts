@@ -15,7 +15,7 @@ const transporter = nodemailer.createTransport({
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const { petId, fullName, phoneNumber, emailAddress, residenceType, location } = req.body;
+    const { petId, fullName, phoneNumber, emailAddress, residenceType, state,city} = req.body;
     try {
       const pet = await prisma.pet.findUnique({
         where: { id: petId },
@@ -33,7 +33,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           <li><strong>Phone Number</strong>: ${phoneNumber}</li>
           <li><strong>Email Address</strong>: ${emailAddress}</li>
           <li><strong>Residence Type</strong>: ${residenceType}</li>
-          <li><strong>Location</strong>: ${location}</li>
+          <li><strong>State</strong>: ${state}</li>
+          <li><strong>City</strong>: ${city}</li>
         </ul>
         <h3>Next Steps:</h3>
         <ol>

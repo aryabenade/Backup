@@ -10,11 +10,6 @@ const AdminNavbar: React.FC = () => {
             Admin Dashboard
           </Link>
         </div>
-        {/* <div className="flex items-center space-x-4">
-          <Link href="/admin/petlist" className="text-white hover:text-gray-400 dark:text-gray-800 dark:hover:text-gray-600">All Pets</Link>
-          <Link href="/admin/grooming" className="text-white hover:text-gray-400 dark:text-gray-800 dark:hover:text-gray-600">Grooming</Link>
-          <Link href="/admin/vet" className="text-white hover:text-gray-400 dark:text-gray-800 dark:hover:text-gray-600">Vet</Link>
-        </div> */}
       </div>
     </nav>
   );

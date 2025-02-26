@@ -1,4 +1,4 @@
- //prisma/schema.prisma
+//prisma/schema.prisma
 
 generator client {
   provider = "prisma-client-js"
@@ -10,17 +10,20 @@ datasource db {
 }
 
 model Pet {
-  id                Int                @id @default(autoincrement())
-  name              String
-  age               Int
-  category          String
-  breed             String
-  state             String
-  city              String
-  contact           String
-  image             String?
-  userId            String  // Store Clerk user ID
-  adoptionRequests  AdoptionRequest[]  // Inverse relation
+  id               Int               @id @default(autoincrement())
+  name             String
+  age              Int
+  ageUnit          String
+  petType          String
+  petBreed         String
+  state            String
+  city             String
+  contact          String
+  image            String?
+  userId           String // Store Clerk user ID
+  adoptionRequests AdoptionRequest[] // Inverse relation
+  notifications    Notification[] // Inverse relation
+  // favorites        Favorite[] // Inverse relation
 }
 
 model AdoptionRequest {
@@ -31,7 +34,8 @@ model AdoptionRequest {
   phoneNumber   String
   emailAddress  String
   residenceType String
-  location      String
+  state         String
+  city          String
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -39,27 +43,32 @@ model AdoptionRequest {
 }
 
 model GroomingBooking {
-  id                    Int      @id @default(autoincrement())
-  name                  String
-  email                 String
-  date                  DateTime
-  timeSlot              String
-  petType               String
-  petName               String
-  petBreed              String
-  petGender             String
-  petSize               String
-  petAggression         String
-  petAge                String
-  address               String
-  packageTitle          String
-  packagePrice          String
-  status                String   @default("Pending")
+  id            Int      @id @default(autoincrement())
+  name          String
+  phoneNumber   String
+  email         String
+  date          DateTime
+  timeSlot      String
+  petType       String
+  petName       String
+  petBreed      String
+  petGender     String
+  petSize       String
+  petAggression String
+  petAge        String
+  city          String
+  address       String
+  packageTitle  String
+  packagePrice  String
+  status        String   @default("Scheduled")
+  userId        String // Add this field to store the user's ID
+  
 }
 
 model VetBooking {
   id               Int      @id @default(autoincrement())
   name             String
+  phoneNumber      String
   email            String
   date             DateTime
   timeSlot         String
@@ -67,7 +76,29 @@ model VetBooking {
   petType          String
   petIssues        String
   medicalAttention String
+  city             String
+  address          String
   packageTitle     String
   packagePrice     String
-  status           String   @default("Pending")
+  status           String   @default("Scheduled")
+  userId           String // Add this field to store the user's ID
 }
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  message   String
+  userId    String
+  petId     Int
+  createdAt DateTime @default(now())
+  read      Boolean  @default(false)
+  pet       Pet      @relation(fields: [petId], references: [id])
+}
+
+// model Favorite {
+//   id        Int      @id @default(autoincrement())
+//   userId    String // Clerk user ID
+//   petId     Int
+//   createdAt DateTime @default(now())
+
+//   pet Pet @relation(fields: [petId], references: [id])
+// }

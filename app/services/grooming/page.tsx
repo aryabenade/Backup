@@ -1,7 +1,7 @@
 // app/services/grooming/page.tsx
 import React from "react";
 import {dogPackages, catPackages} from "./data";
-import GroomingCard from '../../components/GroomingCard';
+import GroomingCard from './GroomingCard';
 
 const GroomingPackages = () => {
   return (

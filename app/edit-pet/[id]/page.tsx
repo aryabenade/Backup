@@ -32,7 +32,9 @@ const EditPetPage: React.FC = () => {
   }, [id]);
 
   if (!pet) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center min-h-screen">
+      <p className="text-2xl font-bold">Loading...</p>
+    </div>;
   }
 
   return <EditPetForm pet={pet} />;

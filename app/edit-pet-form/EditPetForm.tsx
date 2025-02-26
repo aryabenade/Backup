@@ -6,6 +6,12 @@ import { useRouter } from 'next/navigation';
 import { Pet } from '../types';
 import toast, { Toaster } from 'react-hot-toast';
 import { BeatLoader } from 'react-spinners';
+import { catBreeds } from '@/app/data/catBreeds';
+import { dogBreeds } from '@/app/data/dogBreeds';
+import Select from 'react-select';
+
+import StateDropdown from '@/app/components/StateDropdown';
+import CityDropdown from '@/app/components/CityDropdown'
 
 interface EditPetFormProps {
     pet: Pet;
@@ -14,27 +20,45 @@ interface EditPetFormProps {
 const EditPetForm: React.FC<EditPetFormProps> = ({ pet }) => {
     const [name, setName] = useState(pet.name);
     const [age, setAge] = useState(pet.age.toString());
-    const [ageUnit, setAgeUnit] = useState('years'); // Default age unit
-    const [category, setCategory] = useState(pet.category);
-    const [breed, setBreed] = useState(pet.breed);
+    const [ageUnit, setAgeUnit] = useState('weeks'); // Default age unit
     const [state, setState] = useState(pet.state);
     const [city, setCity] = useState(pet.city);
     const [contact, setContact] = useState(pet.contact);
     const [image, setImage] = useState<File | null>(null);
     const [error, setError] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
+    const [petType, setPetType] = useState('Dog');
+    const [petBreed, setPetBreed] = useState('');
+    const [breedOptions, setBreedOptions] = useState<{ label: string, value: string }[]>([]);
+    const [selectedState, setSelectedState] = useState('');
+    const [selectedCity, setSelectedCity] = useState('');
+    // const [selectedState, setSelectedState] = useState('');
+    const [selectedStateId, setSelectedStateId] = useState(0);
 
     // Validation States
     const [nameError, setNameError] = useState<string | null>(null);
     const [ageError, setAgeError] = useState<string | null>(null);
-    const [categoryError, setCategoryError] = useState<string | null>(null);
-    const [breedError, setBreedError] = useState<string | null>(null);
+    const [petBreedError, setPetBreedError] = useState<string | null>(null);
     const [stateError, setStateError] = useState<string | null>(null);
     const [cityError, setCityError] = useState<string | null>(null);
     const [contactError, setContactError] = useState<string | null>(null);
     const [imageError, setImageError] = useState<string | null>(null);
 
     const router = useRouter();
+
+    // Handler for state selection
+    const handleStateChange = (stateName: string, stateId: number) => {
+        setSelectedState(stateName);
+        setSelectedStateId(stateId);
+    };
+
+    useEffect(() => {
+        if (petType === 'Cat') {
+            setBreedOptions(catBreeds.map(breed => ({ label: breed, value: breed })));
+        } else if (petType === 'Dog') {
+            setBreedOptions(dogBreeds.map(breed => ({ label: breed, value: breed })));
+        }
+    }, [petType]);
 
     // Function to handle image upload
     const handleImageUpload = async (file: File): Promise<string> => {
@@ -72,8 +96,7 @@ const EditPetForm: React.FC<EditPetFormProps> = ({ pet }) => {
         // Reset previous errors
         setNameError(null);
         setAgeError(null);
-        setCategoryError(null);
-        setBreedError(null);
+        setPetBreedError(null);
         setStateError(null);
         setCityError(null);
         setContactError(null);
@@ -97,35 +120,27 @@ const EditPetForm: React.FC<EditPetFormProps> = ({ pet }) => {
             isValid = false;
         } else {
             const ageNumber = parseInt(age, 10);
-            if (category === 'Dog' && (ageNumber > 30 || (ageUnit === 'years' && ageNumber > 20))) {
+            if (petType === 'Dog' && (ageNumber > 30 || (ageUnit === 'years' && ageNumber > 20))) {
                 setAgeError('Please enter a valid age for a dog (up to 20 years).');
                 isValid = false;
-            } else if (category === 'Cat' && (ageNumber > 30 || (ageUnit === 'years' && ageNumber > 20))) {
+            } else if (petType === 'Cat' && (ageNumber > 30 || (ageUnit === 'years' && ageNumber > 20))) {
                 setAgeError('Please enter a valid age for a cat (up to 20 years).');
                 isValid = false;
             }
         }
 
-        // Category validation
-        if (!category) {
-            setCategoryError('Category is required.');
-            isValid = false;
-        }
-
         // Breed validation
-        if (!breed) {
-            setBreedError('Breed is required.');
+        if (!petBreed) {
+            setPetBreedError('Pet Breed is required.');
             isValid = false;
         }
-
-        // State validation
-        if (!state) {
+        // Validation logic
+        if (!selectedState) {
             setStateError('State is required.');
             isValid = false;
         }
 
-        // City validation
-        if (!city) {
+        if (!selectedCity) {
             setCityError('City is required.');
             isValid = false;
         }
@@ -138,7 +153,7 @@ const EditPetForm: React.FC<EditPetFormProps> = ({ pet }) => {
             setContactError('Please enter a valid email address.');
             isValid = false;
         }
-                // Image validation
+        // Image validation
         if (!image) {
             setImageError('Image is required.');
             isValid = false;
@@ -160,10 +175,11 @@ const EditPetForm: React.FC<EditPetFormProps> = ({ pet }) => {
                 ...pet,
                 name,
                 age: parseInt(age, 10),
-                category,
-                breed,
-                state,
-                city,
+                ageUnit,
+                petType,
+                petBreed,
+                state: selectedState,
+                city: selectedCity,
                 contact,
                 image: imageUrl,
             };
@@ -243,65 +259,37 @@ const EditPetForm: React.FC<EditPetFormProps> = ({ pet }) => {
                         {ageError && <p className="text-red-500 text-xs italic">{ageError}</p>}
                     </div>
                     <div>
-                        <label htmlFor="category" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
-                            Category
-                        </label>
-                        <select
-                            value={category}
-                            onChange={(e) => setCategory(e.target.value)}
-                            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${categoryError ? 'border-red-500' : ''}`}
-                        >
-                            <option value="">Select Category</option>
+                        <label htmlFor="petType" className="block text-sm font-medium text-gray-700" style={{ fontWeight: '500', fontSize: '1rem' }}>What type of pet?</label>
+                        <select id="petType" value={petType} onChange={(e) => setPetType(e.target.value)} className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow appearance-none">
                             <option value="Dog">Dog</option>
                             <option value="Cat">Cat</option>
                         </select>
-                        {categoryError && <p className="text-red-500 text-xs italic">{categoryError}</p>}
                     </div>
                     <div>
-                        <label htmlFor="breed" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
-                            Breed
-                        </label>
-                        <input
-                            type="text"
-                            id="breed"
-                            value={breed}
-                            onChange={(e) => setBreed(e.target.value)}
-                            className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${breedError ? 'border-red-500' : ''}`}
-                            placeholder="Enter breed"
+                        <label htmlFor="petBreed" className="block text-sm font-medium text-gray-700" style={{ fontWeight: '500', fontSize: '1rem' }}>Breed of your pet?</label>
+                        <Select
+                            id="petBreed"
+                            value={breedOptions.find(option => option.value === petBreed)}
+                            onChange={(option) => setPetBreed(option?.value || '')}
+                            options={breedOptions}
+                            className={`mt-1 ${petBreedError ? 'border-red-500' : 'border-gray-300'}`}
+                            placeholder="Select or search breed"
                         />
-                        {breedError && <p className="text-red-500 text-xs italic">{breedError}</p>}
+                        {petBreedError && <p className="text-red-500 text-xs italic">{petBreedError}</p>}
                     </div>
                     <div>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label htmlFor="state" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
-                                    State
-                                </label>
-                                <input
-                                    type="text"
-                                    id="state"
-                                    value={state}
-                                    onChange={(e) => setState(e.target.value)}
-                                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${stateError ? 'border-red-500' : ''}`}
-                                    placeholder="Enter state"
-                                />
-                                {stateError && <p className="text-red-500 text-xs italic">{stateError}</p>}
-                            </div>
-                            <div>
-                                <label htmlFor="city" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
-                                    City
-                                </label>
-                                <input
-                                    type="text"
-                                    id="city"
-                                    value={city}
-                                    onChange={(e) => setCity(e.target.value)}
-                                    className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${cityError ? 'border-red-500' : ''}`}
-                                    placeholder="Enter city"
-                                />
-                                {cityError && <p className="text-red-500 text-xs italic">{cityError}</p>}
-                            </div>
-                        </div>
+                        <label htmlFor="state" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                            State
+                        </label>
+                        <StateDropdown selectedState={selectedState} onStateChange={handleStateChange} />
+                        {stateError && <p className="text-red-500 text-xs italic">{stateError}</p>}
+                    </div>
+                    <div>
+                        <label htmlFor="city" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                            City
+                        </label>
+                        <CityDropdown stateId={selectedStateId} selectedCity={selectedCity} onCityChange={setSelectedCity} />
+                        {cityError && <p className="text-red-500 text-xs italic">{cityError}</p>}
                     </div>
                     <div>
                         <label htmlFor="contact" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>

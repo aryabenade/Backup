@@ -3,9 +3,10 @@
 export interface Pet {
   id?: number;
   name: string;
-  breed: string;
+  petBreed: string;
   age: number;
-  category: string;
+  ageUnit:string;
+  petType: string;
   state: string;
   city: string;
   contact: string;
@@ -16,6 +17,7 @@ export interface Pet {
 export interface GroomingBookingData {
   id: number; // Add id field here
   name: string;
+  phoneNumber:string;
   email: string;
   date: Date;
   timeSlot: string;
@@ -26,14 +28,17 @@ export interface GroomingBookingData {
   petSize: string;
   petAggression: string;
   petAge: string;
+  city: string;
   address: string;
   packageTitle: string;
   packagePrice: string;
   status: string;
+  userId: string; // Add this field
 }
 
 export interface NewGroomingBookingData {
   name: string;
+  phoneNumber:string;
   email: string;
   date: Date;
   timeSlot: string;
@@ -44,15 +49,18 @@ export interface NewGroomingBookingData {
   petSize: string;
   petAggression: string;
   petAge: string;
+  city: string;
   address: string;
   packageTitle: string;
   packagePrice: string;
+  userId: string; // Add this field
 }
 
 // Adding Vet Booking Interfaces
 export interface VetBookingData {
   id: number;
   name: string;
+  phoneNumber:string;
   email: string;
   date: Date;
   timeSlot: string;
@@ -60,13 +68,17 @@ export interface VetBookingData {
   petType: string;
   petIssues: string;
   medicalAttention: string;
+  city: string;
+  address: string;
   packageTitle: string;
   packagePrice: string;
   status: string;
+  userId: string; // Add this field
 }
 
 export interface NewVetBookingData {
   name: string;
+  phoneNumber:string;
   email: string;
   date: Date;
   timeSlot: string;
@@ -74,6 +86,61 @@ export interface NewVetBookingData {
   petType: string;
   petIssues: string[];
   medicalAttention: string;
+  city: string;
+  address: string;
   packageTitle: string;
   packagePrice: string;
+  userId: string; // Add this field
 }
+
+// Path: app/types.ts
+export interface AdoptionRequest {
+  id: number;
+  petId: number;
+  adopterId: string;
+  fullName: string;
+  phoneNumber: string;
+  emailAddress: string;
+  residenceType: string;
+  state: string;
+  city: string;
+  createdAt: Date; // Change from string to Date
+  updatedAt: Date; // Change from string to Date
+  pet?: {
+    userId: string;
+    name:string,
+  };
+}
+
+export interface NewAdoptionRequest {
+  petId: number;
+  adopterId: string;
+  fullName: string;
+  phoneNumber: string;
+  emailAddress: string;
+  residenceType: string;
+  state: string;
+  city: string;
+}
+
+// app/types.ts
+export interface State {
+  id: number;
+  name: string;
+}
+
+export interface City {
+  id: number;
+  name: string;
+}
+
+// app/types.ts
+export interface Notification {
+  id: number;
+  message: string;
+  userId: string;
+  petId: number;
+  createdAt: Date;
+  read: boolean; // Add this field
+}
+
