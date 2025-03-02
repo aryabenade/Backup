@@ -1,4 +1,4 @@
-//app/components/VetCard.tsx
+//app/services/vet/VetCard.tsx
 
 "use client"
 import React, { useState } from "react";

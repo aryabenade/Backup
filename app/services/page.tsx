@@ -113,21 +113,21 @@ const Services: React.FC = () => {
             </div>
           </Link>
           {/* Pet Walking Services */}
-          <Link href="/services/walking" className="group block bg-white shadow-md rounded-2xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+          {/* <Link href="/services/walking" className="group block bg-white shadow-md rounded-2xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
             <div className="flex flex-col items-center text-center">
               <FaWalking className="text-5xl text-green-500 mb-4 group-hover:rotate-12 transition-transform duration-300" />
               <h2 className="text-2xl font-semibold text-gray-800 mb-2">Pet Walking</h2>
               <p className="text-gray-600">Daily walks to keep your pet active and healthy.</p>
             </div>
-          </Link>
+          </Link> */}
           {/* Pet Sitting Services */}
-          <Link href="/services/sitting" className="group block bg-white shadow-md rounded-2xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
+          {/* <Link href="/services/sitting" className="group block bg-white shadow-md rounded-2xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
             <div className="flex flex-col items-center text-center">
               <FaHome className="text-5xl text-orange-500 mb-4 group-hover:rotate-12 transition-transform duration-300" />
               <h2 className="text-2xl font-semibold text-gray-800 mb-2">Pet Sitting</h2>
               <p className="text-gray-600">Reliable sitting services while you're away.</p>
             </div>
-          </Link>
+          </Link> */}
           {/* Pet Training Services */}
           <Link href="/services/training" className="group block bg-white shadow-md rounded-2xl p-8 hover:shadow-2xl transition-all duration-300 transform hover:scale-105">
             <div className="flex flex-col items-center text-center">

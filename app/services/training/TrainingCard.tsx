@@ -1,23 +1,26 @@
-//app/services/grooming/GroomingCard.tsx
-
-"use client"
+//app/services/training/TrainingCard.tsx
+"use client";
 import React, { useState } from "react";
 import Link from "next/link";
 
-type GroomingPackageProps = {
+type TrainingPackageProps = {
   title: string;
   price: string;
   originalPrice: string;
+  sessionsPerWeek: number;
+  duration: string;
   features: string[];
 };
 
-const GroomingCard: React.FC<GroomingPackageProps> = ({
+const TrainingCard: React.FC<TrainingPackageProps> = ({
   title,
   price,
   originalPrice,
+  sessionsPerWeek,
+  duration,
   features,
 }) => {
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = () => {
     setIsLoading(true);
@@ -31,6 +34,10 @@ const GroomingCard: React.FC<GroomingPackageProps> = ({
           <span className="text-red-500 line-through mr-2">{originalPrice}</span>
           <span className="text-2xl font-bold text-gray-800">{price}</span>
         </div>
+        <div className="text-center mb-4 text-gray-600">
+          <p>{sessionsPerWeek} sessions per week</p>
+          <p>Duration: {duration}</p>
+        </div>
         <ul className="text-sm text-gray-700 space-y-2">
           {features.map((feature, index) => (
             <li key={index} className="flex items-center">
@@ -39,17 +46,24 @@ const GroomingCard: React.FC<GroomingPackageProps> = ({
           ))}
         </ul>
       </div>
-      <Link href={`/services/grooming/form?title=${encodeURIComponent(title)}&price=${encodeURIComponent(price)}`} passHref>
+      <Link
+        href={`/services/training/form?title=${encodeURIComponent(
+          title
+        )}&price=${encodeURIComponent(price)}&sessionsPerWeek=${sessionsPerWeek}`}
+        passHref
+      >
         <button
-          className={`mt-6 w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
+          className={`mt-6 w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition ${
+            isLoading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           onClick={handleClick}
           disabled={isLoading}
         >
-          {isLoading ? "Loading..." : "Book A Groomer"}
+          {isLoading ? "Loading..." : "Book Training"}
         </button>
       </Link>
     </div>
   );
 };
 
-export default GroomingCard;
+export default TrainingCard;

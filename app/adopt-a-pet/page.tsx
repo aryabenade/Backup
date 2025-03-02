@@ -1,5 +1,4 @@
 // AdoptAPet component in app/adopt-a-pet/page.tsx
-
 "use client";
 import React, { useEffect, useState } from 'react';
 import PetCard from '../components/PetCard';
@@ -7,8 +6,10 @@ import Navbar from '../components/Navbar';
 import { Pet } from '../types';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import StateDropdown from '../components/StateDropdown'; 
+import StateDropdown from '../components/StateDropdown';
 import CityDropdown from '../components/CityDropdown';
+import { addFavorite, removeFavorite, fetchFavoritesForUser } from '../profile/favorites/favorites';
+import toast, { Toaster } from 'react-hot-toast';
 
 const AdoptAPet: React.FC = () => {
   const { user } = useUser();
@@ -21,6 +22,7 @@ const AdoptAPet: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [favorites, setFavorites] = useState<Set<number>>(new Set()); // Track favorited pet IDs
 
   useEffect(() => {
     if (!user) {
@@ -28,37 +30,64 @@ const AdoptAPet: React.FC = () => {
       return;
     }
 
-    const fetchPets = async () => {
+    const fetchData = async () => {
       try {
-        const response = await fetch('/api/pets');
-        if (response.ok) {
-          const data: Pet[] = await response.json();
+        // Fetch all pets
+        const petResponse = await fetch('/api/pets');
+        if (petResponse.ok) {
+          const data: Pet[] = await petResponse.json();
           const otherPets = data.filter(pet => pet.userId !== user.id);
           setPets(otherPets);
           setFilteredPets(otherPets);
         } else {
           console.error('Failed to fetch pets');
         }
+
+        // Fetch user's favorites
+        const favoritePets = await fetchFavoritesForUser(user.id);
+        const favoriteIds = new Set(favoritePets.map(pet => pet.id!).filter(id => id !== undefined));
+        setFavorites(favoriteIds);
       } catch (error) {
-        console.error('Error fetching pets:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchPets();
+    fetchData();
   }, [user, router]);
-
 
   const handleAdopt = (petId: number) => {
     router.push(`/adopt-a-pet/form?petId=${petId}`);
   };
 
+  const handleToggleFavorite = async (petId: number, isFavorited: boolean) => {
+    if (!user) return;
+
+    try {
+      if (isFavorited) {
+        await removeFavorite(user.id, petId);
+        setFavorites(prev => {
+          const newFavorites = new Set(prev);
+          newFavorites.delete(petId);
+          return newFavorites;
+        });
+        toast.success('Removed from favorites!', { position: 'bottom-center' });
+      } else {
+        await addFavorite(user.id, petId);
+        setFavorites(prev => new Set(prev).add(petId));
+        toast.success('Added to favorites!', { position: 'bottom-center' });
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast.error('Failed to update favorite!', { position: 'bottom-center' });
+    }
+  };
 
   const handleStateChange = (stateName: string, stateId: number) => {
     setSelectedState(stateName);
     setSelectedStateId(stateId);
-    setSelectedCity(''); // Reset city when state changes
+    setSelectedCity('');
   };
 
   const handleCityChange = (cityName: string) => {
@@ -88,24 +117,18 @@ const AdoptAPet: React.FC = () => {
       <div className="container mx-auto p-4 min-h-screen">
         <div className="flex justify-between items-center mt-8 mb-4">
           <button
-            onClick={() => {
-              setShowFilters(!showFilters);
-            }}
+            onClick={() => setShowFilters(!showFilters)}
             className="bg-blue-600 text-white font-semibold px-4 py-2 rounded-md shadow-md hover:bg-blue-700 transition-colors duration-200 w-32"
           >
             {showFilters ? 'Hide Filters' : 'Show Filters'}
           </button>
-
-
           <div className="flex-grow flex justify-center">
             <h1 className="text-4xl font-bold">Adopt a Pet</h1>
           </div>
-
-          <div className="w-48"></div> {/* This div helps balance the layout */}
+          <div className="w-48"></div>
         </div>
         {showFilters && (
           <div className="bg-gray-100 p-4 rounded-md shadow-md mb-6 relative">
-            {/* "Clear All Filters" button in the top right corner */}
             <button
               onClick={() => {
                 setSelectedPetType('');
@@ -117,7 +140,6 @@ const AdoptAPet: React.FC = () => {
             >
               Clear All Filters
             </button>
-
             <div className="flex flex-col space-y-4">
               <div>
                 <label htmlFor="petType" className="block text-gray-700 text-sm font-bold mb-2">
@@ -165,6 +187,7 @@ const AdoptAPet: React.FC = () => {
             {filteredPets.map((pet) => (
               <PetCard
                 key={pet.id}
+                id={pet.id} // Pass the id explicitly
                 name={pet.name}
                 age={pet.age}
                 ageUnit={pet.ageUnit}
@@ -174,7 +197,10 @@ const AdoptAPet: React.FC = () => {
                 city={pet.city}
                 contact={pet.contact}
                 image={pet.image}
-                onAdopt={() => pet.id && handleAdopt(pet.id)} // Ensure pet.id is defined
+                onAdopt={() => pet.id && handleAdopt(pet.id)}
+                isAdoptPage={true} // Indicate this is the AdoptAPet page
+                onToggleFavorite={handleToggleFavorite}
+                isFavorited={pet.id ? favorites.has(pet.id) : false}
               />
             ))}
           </div>
@@ -184,6 +210,7 @@ const AdoptAPet: React.FC = () => {
           </div>
         )}
       </div>
+      <Toaster />
     </div>
   );
 };

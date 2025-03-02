@@ -1,20 +1,20 @@
 
-// Path: app/payment/page.tsx
-
+// // Path: app/payment/page.tsx
 "use client";
 
 import { useSearchParams, useRouter } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 import { storeGroomingBooking } from '@/app/services/grooming/groomingBooking';
-import { storeVetBooking } from '@/app/services/vet/vetBooking'; // Import storeVetBooking
-import { useUser } from '@clerk/nextjs'; // Import Clerk's useUser hook
+import { storeVetBooking } from '@/app/services/vet/vetBooking';
+import { storeTrainingBooking } from '@/app/services/training/trainingBooking'; // Import training booking
+import { useUser } from '@clerk/nextjs';
 import { BeatLoader } from 'react-spinners';
 import axios from 'axios';
 
 const Payment: React.FC = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { user } = useUser(); // Use Clerk's useUser hook to get the authenticated user
+    const { user } = useUser();
 
     const [formData, setFormData] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -34,7 +34,6 @@ const Payment: React.FC = () => {
         setError(null);
 
         if (formData && user) {
-            // Add userId to formData
             const dataWithUserId = { ...formData, userId: user.id };
 
             try {
@@ -43,9 +42,11 @@ const Payment: React.FC = () => {
                     response = await storeGroomingBooking(dataWithUserId);
                 } else if (formData.bookingType === 'vet') {
                     response = await storeVetBooking(dataWithUserId);
+                } else if (formData.bookingType === 'training') {
+                    response = await storeTrainingBooking(dataWithUserId); // Handle training booking
                 }
 
-                console.log("API Response:", response); // Add debug log
+                console.log("API Response:", response);
 
                 if (response) {
                     // Call the appropriate email API to send the confirmation email
@@ -57,7 +58,14 @@ const Payment: React.FC = () => {
                         await axios.post('/api/sendVetEmail', {
                             bookingId: response.id,
                         });
+                    } else if (formData.bookingType === 'training') {
+                        // await axios.post('/api/sendTrainingEmail', { // Training email API
+                        //     bookingId: response.id,
+                        // });
                     }
+
+                    // Clear sessionStorage after successful booking
+                    sessionStorage.removeItem('formData');
 
                     router.push(`/services/confirmation?packageTitle=${encodeURIComponent(formData.packageTitle)}&packagePrice=${encodeURIComponent(formData.packagePrice)}&paymentMethod=PayAfterService`);
                 } else {
@@ -82,9 +90,9 @@ const Payment: React.FC = () => {
                             <label className="block text-sm font-medium text-gray-700">Package Details</label>
                             <div className="mt-1 p-2 w-full border border-gray-300 rounded-md">
                                 <p>Package Name: {formData.packageTitle}</p>
-                                <p>Package Price: ₹{formData.packagePrice}</p>
+                                <p>Package Price: {formData.packagePrice}</p>
                                 <p>Tax: Inclusive in package</p>
-                                <p>Total: ₹{formData.packagePrice}</p>
+                                <p>Total: {formData.packagePrice}</p>
                             </div>
                         </div>
                         <div>

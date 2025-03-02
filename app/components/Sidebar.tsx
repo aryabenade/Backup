@@ -99,7 +99,7 @@ const Sidebar: React.FC = () => {
         </li>
         <li className="border-b border-gray-300 py-2 flex items-center">
           <FaHeart className="mr-2 text-gray-800" />
-          <Link href="/profile/favourites" className="block p-2 text-gray-800 hover:text-blue-500 font-semibold">
+          <Link href="/profile/favorites" className="block p-2 text-gray-800 hover:text-blue-500 font-semibold">
             Favorites
           </Link>
         </li>

@@ -144,3 +144,47 @@ export interface Notification {
   read: boolean; // Add this field
 }
 
+export interface TrainingBookingData {
+  id: number;
+  name: string;
+  phoneNumber: string;
+  email: string;
+  startDate: Date;
+  preferredDays: string[];
+  petType: string;
+  petName: string;
+  petBreed: string;
+  petGender: string;
+  petSize: string;
+  petAggression: string;
+  petAge: string;
+  city: string;
+  address: string;
+  packageTitle: string;
+  packagePrice: string;
+  status: string;
+  userId: string;
+  sessionsPerWeek: number;   // Added
+  sessionsCompleted: number; // Added
+}
+
+export interface NewTrainingBookingData {
+  name: string;
+  phoneNumber: string;
+  email: string;
+  startDate: Date;
+  preferredDays: string[];
+  petType: string;
+  petName: string;
+  petBreed: string;
+  petGender: string;
+  petSize: string;
+  petAggression: string;
+  petAge: string;
+  city: string;
+  address: string;
+  packageTitle: string;
+  packagePrice: string;
+  userId: string;
+  sessionsPerWeek: number;   // Added
+}

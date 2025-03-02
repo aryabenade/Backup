@@ -40,15 +40,32 @@
 // export default Navbar;
 
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { FaBars } from 'react-icons/fa';
 import Sidebar from '../components/Sidebar';
 import 'tailwindcss/tailwind.css';
 import NotificationDropdown from '../profile/notifications/NotificationDropdown';
+import { useUser } from '@clerk/nextjs';
 
 const Navbar: React.FC = () => {
+  // const { user, isLoaded } = useUser();
+  // const allowedEmail = "benadearya@gmail.com"
+  // const [isAuthorized, setIsAuthorized] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  // useEffect(() => {
+  //   if (isLoaded) {
+  //     const userEmail = user?.primaryEmailAddress?.emailAddress;
+
+  //     if (user && userEmail == allowedEmail) {
+  //       // router.replace('/sign-in'); // Prevents back button issues
+  //       setIsAuthorized(true);
+  //     }
+  //     //  else {
+  //     // }
+  //   }
+  // }, [user, isLoaded]);
 
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
@@ -67,6 +84,12 @@ const Navbar: React.FC = () => {
           <Link href="/adopt-a-pet" className="text-white hover:text-gray-400 dark:text-gray-800 dark:hover:text-gray-600">Adopt a Pet</Link>
           <Link href="/list-a-pet" className="text-white hover:text-gray-400 dark:text-gray-800 dark:hover:text-gray-600">List a Pet</Link>
           <Link href="/services" className="text-white hover:text-gray-400 dark:text-gray-800 dark:hover:text-gray-600">Services</Link>
+          {/* {
+            isAuthorized && <Link href="/groomer" className="text-white hover:text-gray-400 dark:text-gray-800 dark:hover:text-gray-600">Groomer</Link>
+          }
+          {
+            isAuthorized && <Link href="/vet" className="text-white hover:text-gray-400 dark:text-gray-800 dark:hover:text-gray-600">Vet</Link>
+          } */}
           <NotificationDropdown />
           <FaBars
             size={24}

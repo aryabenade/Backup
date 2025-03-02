@@ -396,7 +396,6 @@ import FormReminder from '@/app/components/FormReminder';
 import { catBreeds } from '@/app/data/catBreeds';
 import { dogBreeds } from '@/app/data/dogBreeds';
 import Select from 'react-select';
-// Import StateDropdown and CityDropdown components
 import StateDropdown from '@/app/components/StateDropdown';
 import CityDropdown from '@/app/components/CityDropdown'
 
@@ -406,8 +405,6 @@ const PetListingForm: React.FC = () => {
     const [name, setName] = useState('');
     const [age, setAge] = useState('');
     const [ageUnit, setAgeUnit] = useState('weeks'); // Default age unit
-    // const [state, setState] = useState('');
-    // const [city, setCity] = useState('');
     const [contact, setContact] = useState('');
     const [image, setImage] = useState<File | null>(null);
     const [formSubmitted, setFormSubmitted] = useState(false);
@@ -418,7 +415,6 @@ const PetListingForm: React.FC = () => {
     const [breedOptions, setBreedOptions] = useState<{ label: string, value: string }[]>([]);
     const [selectedState, setSelectedState] = useState('');
     const [selectedCity, setSelectedCity] = useState('');
-    // const [selectedState, setSelectedState] = useState('');
     const [selectedStateId, setSelectedStateId] = useState(0);
 
 

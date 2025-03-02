@@ -1,7 +1,7 @@
 export const cityOptions = [
-    { label: "Dahisar", value: "Dahisar" },
     { label: "Mira Road", value: "Mira Road" },
-    { label: "Bhayandar", value: "Bhayandar" },
+    // { label: "Dahisar", value: "Dahisar" },
+    // { label: "Bhayandar", value: "Bhayandar" },
     // { label: "Mumbai", value: "Mumbai" },
     // { label: "Pune", value: "Pune" },
     // { label: "Nagpur", value: "Nagpur" },

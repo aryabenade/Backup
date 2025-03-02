@@ -1,4 +1,4 @@
-// Path: app/services/favorites/favoriteService.ts
+// Path: app/profile/favorites/favorites.ts
 
 "use server";
 
