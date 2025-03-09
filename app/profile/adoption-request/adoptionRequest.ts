@@ -9,7 +9,7 @@ const prisma = new PrismaClient();
 
 // Action 1: Create an Adoption Request with Notification
 export async function createAdoptionRequest(data: NewAdoptionRequest): Promise<AdoptionRequest> {
-  const { petId, adopterId, fullName, phoneNumber, emailAddress, residenceType,state,city } = data;
+  const { petId, adopterId, fullName, phoneNumber, emailAddress, residenceType,state,city,profileImage } = data;
 
   try {
     const adoptionRequest = await prisma.adoptionRequest.create({
@@ -21,7 +21,8 @@ export async function createAdoptionRequest(data: NewAdoptionRequest): Promise<A
         emailAddress,
         residenceType,
         state,
-        city
+        city,
+        profileImage, // Save profile image to the database
       },
     });
 

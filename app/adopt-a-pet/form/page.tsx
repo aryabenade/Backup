@@ -1,6 +1,4 @@
-
 // PetAdoptionForm component in app/adopt-a-pet/form/page.tsx
-//part 1
 "use client";
 
 import React, { useEffect, useState } from 'react';
@@ -9,11 +7,10 @@ import { useUser } from '@clerk/nextjs';
 import toast, { Toaster } from 'react-hot-toast';
 import { BeatLoader } from 'react-spinners';
 import FormReminder from '@/app/components/FormReminder';
-import { createAdoptionRequest } from '../../profile/adoption-request/adoptionRequest'; // Import the service function
+import { createAdoptionRequest } from '../../profile/adoption-request/adoptionRequest';
 import { NewAdoptionRequest } from '@/app/types';
-import Select from 'react-select';
 import StateDropdown from '@/app/components/StateDropdown';
-import CityDropdown from '@/app/components/CityDropdown'
+import CityDropdown from '@/app/components/CityDropdown';
 
 const PetAdoptionForm: React.FC = () => {
   const { user } = useUser();
@@ -29,7 +26,7 @@ const PetAdoptionForm: React.FC = () => {
   const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedStateId, setSelectedStateId] = useState(0);
-
+  const [profileImage, setProfileImage] = useState<string | null>(null); // Add state for profile image
 
   // Validation States
   const [fullNameError, setFullNameError] = useState<string | null>(null);
@@ -39,7 +36,27 @@ const PetAdoptionForm: React.FC = () => {
   const [stateError, setStateError] = useState<string | null>(null);
   const [cityError, setCityError] = useState<string | null>(null);
 
-  
+  // Pre-fill form fields with Clerk user data
+  useEffect(() => {
+    if (user) {
+      const userFullName = user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim();
+      if (userFullName) setFullName(userFullName);
+
+      const userEmail = user.primaryEmailAddress?.emailAddress;
+      if (userEmail) setEmailAddress(userEmail);
+
+      const userProfileImage = user.imageUrl;
+      if (userProfileImage) setProfileImage(userProfileImage);
+
+      const primaryPhone = user.phoneNumbers?.find(phone => phone.id === user.primaryPhoneNumberId)?.phoneNumber;
+      const phone = primaryPhone || user.phoneNumbers?.[0]?.phoneNumber;
+      if (phone) {
+        const cleanedPhone = phone.replace(/\D/g, '').slice(-10);
+        setPhoneNumber(cleanedPhone);
+      }
+    }
+  }, [user]);
+
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('petId');
@@ -50,14 +67,12 @@ const PetAdoptionForm: React.FC = () => {
       toast.error('Pet ID is missing', { position: 'bottom-center' });
     }
   }, []);
-  
-  // Handler for state selection
+
   const handleStateChange = (stateName: string, stateId: number) => {
     setSelectedState(stateName);
     setSelectedStateId(stateId);
   };
 
-  // Validation functions
   const validateEmail = (email: string) => {
     const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return regex.test(email);
@@ -65,13 +80,12 @@ const PetAdoptionForm: React.FC = () => {
 
   const validatePhoneNumber = (number: string) => {
     const regex = /^[0-9]{10}$/;
-    return regex.test(number); 
+    return regex.test(number);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Reset previous errors
     setFullNameError(null);
     setPhoneNumberError(null);
     setEmailAddressError(null);
@@ -82,13 +96,10 @@ const PetAdoptionForm: React.FC = () => {
 
     let isValid = true;
 
-    // Full Name Validation
     if (!fullName) {
       setFullNameError('Full Name is required.');
       isValid = false;
     }
-
-    // Phone Number Validation
     if (!phoneNumber) {
       setPhoneNumberError('Phone Number is required.');
       isValid = false;
@@ -96,8 +107,6 @@ const PetAdoptionForm: React.FC = () => {
       setPhoneNumberError('Phone Number must be 10 digits.');
       isValid = false;
     }
-
-    // Email Address Validation
     if (!emailAddress) {
       setEmailAddressError('Email Address is required.');
       isValid = false;
@@ -105,26 +114,21 @@ const PetAdoptionForm: React.FC = () => {
       setEmailAddressError('Please enter a valid email address.');
       isValid = false;
     }
-
-    // Residence Type Validation
     if (!residenceType) {
       setResidenceTypeError('Type of Residence is required.');
       isValid = false;
     }
-
-    
     if (!selectedState) {
       setStateError('State is required.');
       isValid = false;
     }
-
     if (!selectedCity) {
       setCityError('City is required.');
       isValid = false;
     }
 
     if (!isValid) {
-      return; // Stop submission if there are validation errors
+      return;
     }
 
     if (!user?.id || !petId) {
@@ -134,7 +138,7 @@ const PetAdoptionForm: React.FC = () => {
     }
 
     const adoptionRequest: NewAdoptionRequest = {
-      petId: parseInt(petId, 10),  // Ensure petId is sent as an integer
+      petId: parseInt(petId, 10),
       adopterId: user.id,
       fullName,
       phoneNumber,
@@ -142,24 +146,25 @@ const PetAdoptionForm: React.FC = () => {
       residenceType,
       state: selectedState,
       city: selectedCity,
+      profileImage, // Include profile image
     };
 
     try {
       setLoading(true);
-      const newAdoptionRequest = await createAdoptionRequest(adoptionRequest); // Use the service function
+      const newAdoptionRequest = await createAdoptionRequest(adoptionRequest);
 
-      // Call the sendEmail API after the data is stored in the database
       await fetch('/api/sendEmail', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          petId: newAdoptionRequest.petId, // Use data from the newly created request
+          petId: newAdoptionRequest.petId,
           fullName: newAdoptionRequest.fullName,
           phoneNumber: newAdoptionRequest.phoneNumber,
           emailAddress: newAdoptionRequest.emailAddress,
           residenceType: newAdoptionRequest.residenceType,
-          state:newAdoptionRequest.state,
-          city:newAdoptionRequest.city,
+          state: newAdoptionRequest.state,
+          city: newAdoptionRequest.city,
+          profileImage: newAdoptionRequest.profileImage, // Include profile image in email
         }),
       });
 
@@ -168,7 +173,7 @@ const PetAdoptionForm: React.FC = () => {
       toast.success('Adoption request submitted successfully!', { position: 'bottom-center' });
       setTimeout(() => {
         router.push('/adopt-a-pet');
-      }, 2000); 
+      }, 2000);
     } catch (err: any) {
       setError(`Failed to submit adoption request: ${err instanceof Error ? err.message : 'An unknown error occurred'}`);
       toast.error(`Failed to submit adoption request: ${err instanceof Error ? err.message : 'An unknown error occurred'}`, { position: 'bottom-center' });
@@ -177,9 +182,6 @@ const PetAdoptionForm: React.FC = () => {
     }
   };
 
-  //part 1 ends here
-
-  //part 2
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex items-center justify-center">
       <Toaster position="top-center" />
@@ -193,105 +195,118 @@ const PetAdoptionForm: React.FC = () => {
             <p className="mt-2">Your form has been submitted successfully! Redirecting...</p>
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="text-center text-red-500 text-sm mb-4">
-                {error}
+          <>
+            {profileImage && (
+              <div className="flex justify-center mb-6">
+                <img
+                  src={profileImage}
+                  alt="User Profile"
+                  className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/placeholder-profile.png';
+                  }}
+                />
               </div>
             )}
-            <div>
-              <label htmlFor="fullName" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
-                Full Name
-              </label>
-              <input
-                type="text"
-                id="fullName"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${fullNameError ? 'border-red-500' : ''}`}
-                placeholder="Enter your full name"
-              />
-              {fullNameError && <p className="text-red-500 text-xs italic">{fullNameError}</p>}
-            </div>
-            <div>
-              <label htmlFor="phoneNumber" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
-                Phone Number
-              </label>
-              <input
-                type="tel"
-                id="phoneNumber"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${phoneNumberError ? 'border-red-500' : ''}`}
-                placeholder="Enter your phone number"
-              />
-              {phoneNumberError && <p className="text-red-500 text-xs italic">{phoneNumberError}</p>}
-            </div>
-            <div>
-              <label htmlFor="emailAddress" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
-                Email Address
-              </label>
-              <input
-                type="email"
-                id="emailAddress"
-                value={emailAddress}
-                onChange={(e) => setEmailAddress(e.target.value)}
-                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${emailAddressError ? 'border-red-500' : ''}`}
-                placeholder="Enter your email address"
-              />
-              {emailAddressError && <p className="text-red-500 text-xs italic">{emailAddressError}</p>}
-            </div>
-            <div>
-              <label htmlFor="residenceType" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
-                Type of Residence
-              </label>
-              <select
-                id="residenceType"
-                value={residenceType}
-                onChange={(e) => setResidenceType(e.target.value)}
-                className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${residenceTypeError ? 'border-red-500' : ''}`}
-              >
-                <option value="Apartment">Apartment</option>
-                <option value="House">House</option>
-                <option value="Flat">Flat</option>
-              </select>
-              {residenceTypeError && <p className="text-red-500 text-xs italic">{residenceTypeError}</p>}
-            </div>
-            <div>
-              <label htmlFor="state" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
-                State
-              </label>
-              <StateDropdown selectedState={selectedState} onStateChange={handleStateChange} />
-              {stateError && <p className="text-red-500 text-xs italic">{stateError}</p>}
-            </div>
-            <div>
-              <label htmlFor="city" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
-                City
-              </label>
-              <CityDropdown stateId={selectedStateId} selectedCity={selectedCity} onCityChange={setSelectedCity} />
-              {cityError && <p className="text-red-500 text-xs italic">{cityError}</p>}
-            </div>
-
-            <FormReminder message="Your information will be sent to the pet owner, who will review your request.
-              If the owner is interested, they will contact you for the next steps. 
-              Thank you for considering giving a pet a new loving home!"/>
-            <div className="flex items-center justify-between">
-              <button
-                type="submit"
-                className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                disabled={loading}
-              >
-                {loading ? (
-                  <div className="flex items-center justify-center">
-                    <BeatLoader color="white" size={8} margin={3} />
-                    <span className="ml-2">Submitting...</span>
-                  </div>
-                ) : (
-                  'Submit Adoption Request'
-                )}
-              </button>
-            </div>
-          </form>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <div className="text-center text-red-500 text-sm mb-4">
+                  {error}
+                </div>
+              )}
+              <div>
+                <label htmlFor="fullName" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${fullNameError ? 'border-red-500' : ''}`}
+                  placeholder="Enter your full name"
+                />
+                {fullNameError && <p className="text-red-500 text-xs italic">{fullNameError}</p>}
+              </div>
+              <div>
+                <label htmlFor="phoneNumber" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  id="phoneNumber"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${phoneNumberError ? 'border-red-500' : ''}`}
+                  placeholder="Enter your phone number"
+                />
+                {phoneNumberError && <p className="text-red-500 text-xs italic">{phoneNumberError}</p>}
+              </div>
+              <div>
+                <label htmlFor="emailAddress" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="emailAddress"
+                  value={emailAddress}
+                  onChange={(e) => setEmailAddress(e.target.value)}
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${emailAddressError ? 'border-red-500' : ''}`}
+                  placeholder="Enter your email address"
+                />
+                {emailAddressError && <p className="text-red-500 text-xs italic">{emailAddressError}</p>}
+              </div>
+              <div>
+                <label htmlFor="residenceType" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                  Type of Residence
+                </label>
+                <select
+                  id="residenceType"
+                  value={residenceType}
+                  onChange={(e) => setResidenceType(e.target.value)}
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${residenceTypeError ? 'border-red-500' : ''}`}
+                >
+                  <option value="Apartment">Apartment</option>
+                  <option value="House">House</option>
+                  <option value="Flat">Flat</option>
+                </select>
+                {residenceTypeError && <p className="text-red-500 text-xs italic">{residenceTypeError}</p>}
+              </div>
+              <div>
+                <label htmlFor="state" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                  State
+                </label>
+                <StateDropdown selectedState={selectedState} onStateChange={handleStateChange} />
+                {stateError && <p className="text-red-500 text-xs italic">{stateError}</p>}
+              </div>
+              <div>
+                <label htmlFor="city" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                  City
+                </label>
+                <CityDropdown stateId={selectedStateId} selectedCity={selectedCity} onCityChange={setSelectedCity} />
+                {cityError && <p className="text-red-500 text-xs italic">{cityError}</p>}
+              </div>
+              <FormReminder message="Your information will be sent to the pet owner, who will review your request.
+                If the owner is interested, they will contact you for the next steps. 
+                Thank you for considering giving a pet a new loving home!" />
+              <div className="flex items-center justify-between">
+                <button
+                  type="submit"
+                  className="bg-blue-700 hover:bg-blue-800 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                  disabled={loading}
+                >
+                  {loading ? (
+                    <div className="flex items-center justify-center">
+                      <BeatLoader color="white" size={8} margin={3} />
+                      <span className="ml-2">Submitting...</span>
+                    </div>
+                  ) : (
+                    'Submit Adoption Request'
+                  )}
+                </button>
+              </div>
+            </form>
+          </>
         )}
       </div>
     </div>
@@ -299,4 +314,3 @@ const PetAdoptionForm: React.FC = () => {
 };
 
 export default PetAdoptionForm;
-//part 2 ends 

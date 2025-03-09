@@ -5,13 +5,14 @@ export interface Pet {
   name: string;
   petBreed: string;
   age: number;
-  ageUnit:string;
+  ageUnit: string;
   petType: string;
   state: string;
   city: string;
   contact: string;
   image: string | null;
-  userId: string; // Add this field
+  userId: string;
+  createdAt?: Date;  // Add this field
 }
 
 export interface GroomingBookingData {
@@ -106,6 +107,7 @@ export interface AdoptionRequest {
   city: string;
   createdAt: Date; // Change from string to Date
   updatedAt: Date; // Change from string to Date
+  profileImage?: string|null// Add this field
   pet?: {
     userId: string;
     name:string,
@@ -121,6 +123,7 @@ export interface NewAdoptionRequest {
   residenceType: string;
   state: string;
   city: string;
+  profileImage?: string|null // Add this field
 }
 
 // app/types.ts

@@ -9,6 +9,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model Pet {
   id               Int               @id @default(autoincrement())
   name             String
@@ -20,10 +21,11 @@ model Pet {
   city             String
   contact          String
   image            String?
-  userId           String // Store Clerk user ID
-  adoptionRequests AdoptionRequest[] // Inverse relation
-  notifications    Notification[] // Inverse relation
-  favorites        Favorite[] // Inverse relation
+  userId           String
+  createdAt        DateTime          @default(now())  // Add this line
+  adoptionRequests AdoptionRequest[]
+  notifications    Notification[]
+  favorites        Favorite[]
 }
 
 model AdoptionRequest {
@@ -36,6 +38,7 @@ model AdoptionRequest {
   residenceType String
   state         String
   city          String
+  profileImage  String?  // Add this field, nullable
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 

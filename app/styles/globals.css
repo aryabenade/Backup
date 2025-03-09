@@ -29,3 +29,9 @@ html {
 /* body {
   font-family: 'Inter', sans-serif;
 } */
+
+/* globals.css */
+html {
+  height: 100%; /* Ensure the html and body take up full viewport height */
+  overflow-y: scroll; /* Force scrollbar to always be visible on the y-axis */
+}

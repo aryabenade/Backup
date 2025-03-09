@@ -1,3 +1,4 @@
+//app/profile/notifications/notifications.ts
 "use server";
 
 import { PrismaClient } from '@prisma/client';

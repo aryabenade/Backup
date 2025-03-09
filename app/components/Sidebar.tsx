@@ -66,44 +66,55 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="p-4">
-      <ul className="space-y-0">
-        <li className='text-black flex items-center cursor-pointer border-b hover:text-blue-500 border-gray-300 pb-2' onClick={handleClick}>
+    <div className="p-4 bg-white rounded-lg shadow-md">
+      <ul className="space-y-2">
+        <li
+          className="flex items-center cursor-pointer border-b border-gray-200 pb-2 text-gray-800 hover:text-orange-500 transition duration-300"
+          onClick={handleClick}
+        >
           <SignedOut>
             <SignInButton>
-              <button className="text-white hover:text-gray-400 dark:text-gray-800 dark:hover:text-gray-600">
+              <button className="text-gray-800 hover:text-orange-500 transition duration-300">
                 <FaUserCircle size={24} />
               </button>
             </SignInButton>
           </SignedOut>
           <SignedIn>
-            <div className='flex items-center'>
+            <div className="flex items-center">
               <div ref={userButtonRef}>
                 <UserButton />
               </div>
-              <span className='ml-2 font-semibold'>My Profile</span>
+              <span className="ml-2 font-semibold">My Profile</span>
             </div>
           </SignedIn>
         </li>
-        <li className="border-b border-gray-300 py-2 flex items-center">
-          <FaShoppingCart className="mr-2 text-gray-800" />
-          <Link href="/profile/orders" className="block p-2 text-gray-800 hover:text-blue-500 font-semibold">
+        <li className="border-b border-gray-200 py-2 flex items-center">
+          <FaShoppingCart className="mr-2 text-orange-500" />
+          <Link
+            href="/profile/orders"
+            className="block p-2 text-gray-800 hover:text-orange-500 font-semibold transition duration-300"
+          >
             My Orders
           </Link>
         </li>
-        <li className="border-b border-gray-300 py-2 flex items-center">
-          <FaPaw className="mr-2 text-gray-800" />
-          <Link href="/profile/adoption-request" className="block p-2 text-gray-800 hover:text-blue-500 font-semibold">
+        <li className="border-b border-gray-200 py-2 flex items-center">
+          <FaPaw className="mr-2 text-orange-500" />
+          <Link
+            href="/profile/adoption-request"
+            className="block p-2 text-gray-800 hover:text-orange-500 font-semibold transition duration-300"
+          >
             Adoption Requests
           </Link>
         </li>
-        <li className="border-b border-gray-300 py-2 flex items-center">
-          <FaHeart className="mr-2 text-gray-800" />
-          <Link href="/profile/favorites" className="block p-2 text-gray-800 hover:text-blue-500 font-semibold">
+        <li className="border-b border-gray-200 py-2 flex items-center">
+          <FaHeart className="mr-2 text-orange-500" />
+          <Link
+            href="/profile/favorites"
+            className="block p-2 text-gray-800 hover:text-orange-500 font-semibold transition duration-300"
+          >
             Favorites
           </Link>
         </li>
-        {/* Add more links as needed */}
       </ul>
     </div>
   );

@@ -1,4 +1,4 @@
-// Path: app/profile/favorites/page.tsx
+//app/profile/favorites/page.tsx
 "use client";
 import React, { useEffect, useState } from 'react';
 import 'tailwindcss/tailwind.css';
@@ -7,17 +7,19 @@ import { Pet } from '@/app/types';
 import { useUser } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/app/components/Navbar';
-import { fetchFavoritesForUser, removeFavorite } from './favorites'; // Import server actions
+import { fetchFavoritesForUser, removeFavorite } from './favorites';
 import { toast, Toaster } from 'react-hot-toast';
 
 const FavoritesPage: React.FC = () => {
-  const { user } = useUser();
+  const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
   const [favoritePets, setFavoritePets] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) {
+    if (!isLoaded) return; // Wait for Clerk to load
+
+    if (!isSignedIn) {
       router.push('/sign-in');
       return;
     }
@@ -35,18 +37,18 @@ const FavoritesPage: React.FC = () => {
     };
 
     loadFavorites();
-  }, [user, router]);
+  }, [isLoaded, isSignedIn, user, router]);
 
   const handleAdopt = (petId: number) => {
     router.push(`/adopt-a-pet/form?petId=${petId}`);
   };
 
   const handleToggleFavorite = async (petId: number, isFavorited: boolean) => {
-    if (!user || !isFavorited) return; // Only allow removal since it's already favorited
+    if (!user || !isFavorited) return;
 
     try {
       await removeFavorite(user.id, petId);
-      setFavoritePets(prevPets => prevPets.filter(pet => pet.id !== petId));
+      setFavoritePets((prevPets) => prevPets.filter((pet) => pet.id !== petId));
       toast.success('Removed from favorites!', { position: 'bottom-center' });
     } catch (error) {
       console.error('Error removing favorite:', error);
@@ -74,10 +76,11 @@ const FavoritesPage: React.FC = () => {
             city={pet.city}
             contact={pet.contact}
             image={pet.image}
+            createdAt={pet.createdAt}
             onAdopt={() => pet.id && handleAdopt(pet.id)}
-            isAdoptPage={true} // Enable heart icon
+            isAdoptPage={true}
             onToggleFavorite={handleToggleFavorite}
-            isFavorited={true} // All pets here are favorited
+            isFavorited={true}
           />
         ))}
       </div>
@@ -85,16 +88,16 @@ const FavoritesPage: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="bg-gray-100 min-h-screen">
       <Navbar />
-      <div className="container mx-auto p-4 min-h-screen">
-        {loading ? (
-          <div className="flex justify-center items-center min-h-screen">
-            <p className="text-2xl font-bold">Loading...</p>
+      <div className="container mx-auto p-4">
+        {loading || !isLoaded ? (
+          <div className="flex justify-center items-center min-h-[50vh]">
+            <p className="text-2xl font-bold text-gray-800">Loading...</p>
           </div>
         ) : (
           <>
-            <h2 className="text-2xl font-bold mb-6 text-center mt-10">
+            <h2 className="text-2xl font-bold mb-6 text-center mt-10 text-gray-800">
               {favoritePets.length > 0 ? 'Your Favorite Pets' : 'No Favorite Pets Found'}
             </h2>
             {renderFavorites()}

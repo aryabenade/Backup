@@ -1,4 +1,4 @@
-// Path: app/profile/adoption-request/page.tsx
+
 "use client";
 import React, { useEffect, useState } from 'react';
 import { useUser } from '@clerk/nextjs';
@@ -7,9 +7,7 @@ import Navbar from '../../components/Navbar';
 import { AdoptionRequest, Pet } from '../../types';
 import { fetchAdoptionRequestsByUserId, deleteAdoptionRequest } from './adoptionRequest';
 import Link from 'next/link';
-import { FaEye, FaEyeSlash, FaPhoneAlt, FaTrash, FaWhatsapp } from 'react-icons/fa';
-import Popup from '../../components/Popup';
-import toast, { Toaster } from 'react-hot-toast'; // Import react-hot-toast
+import { FaTrash, FaPhoneAlt, FaWhatsapp, FaEye, FaEyeSlash } from 'react-icons/fa'; import Popup from '../../components/Popup';
 
 const AdoptionRequestPage: React.FC = () => {
   const { user, isLoaded, isSignedIn } = useUser();
@@ -74,21 +72,11 @@ const AdoptionRequestPage: React.FC = () => {
     if (deleteRequestId !== null) {
       try {
         await deleteAdoptionRequest(deleteRequestId);
-        setAdoptionRequests((prevRequests) =>
-          prevRequests.filter((request) => request.id !== deleteRequestId)
-        );
+        setAdoptionRequests((prevRequests) => prevRequests.filter((request) => request.id !== deleteRequestId));
         setDeleteRequestId(null);
         setIsPopupOpen(false);
-        toast.success('Adoption request deleted successfully!', { // Success toast
-          duration: 4000,
-          position: 'bottom-center',
-        });
       } catch (error) {
         console.error('Error deleting adoption request:', error);
-        toast.error('Failed to delete adoption request. Please try again.', { // Error toast
-          duration: 4000,
-          position: 'bottom-center',
-        });
       }
     }
   };
@@ -98,9 +86,8 @@ const AdoptionRequestPage: React.FC = () => {
       {pets.map((pet) => (
         <button
           key={pet.id}
-          className={`py-2 px-4 text-xl font-semibold text-gray-800 ${
-            activePetId === pet.id ? 'border-b-2 border-orange-500 text-orange-500' : ''
-          }`}
+          className={`py-2 px-4 text-xl font-semibold text-gray-800 ${activePetId === pet.id ? 'border-b-2 border-orange-500 text-orange-500' : ''
+            }`}
           onClick={() => setActivePetId(pet.id!)}
         >
           {pet.name}
@@ -136,19 +123,19 @@ const AdoptionRequestPage: React.FC = () => {
                 <div className="flex gap-4 mt-4">
                   <a
                     href={`tel:${request.phoneNumber}`}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-md font-medium hover:bg-blue-700 flex items-center"
+                    className="bg-orange-500 text-white px-4 py-2 rounded-md font-medium hover:bg-orange-600 flex items-center"
                   >
-                    <FaPhoneAlt size={21} className="mr-2" />
+                    <FaPhoneAlt className="mr-2" /> {/* Replaced FaPhone with FaPhoneAlt */}
                     Call Now
                   </a>
                   <a
-                    href={`https://wa.me/${request.phoneNumber}?text=Hi ${request.fullName}, I’m reaching out about adopting ${
-                      pets.find((pet) => pet.id === request.petId)?.name || 'your pet'
-                    }!`}
+                    href={`https://wa.me/${request.phoneNumber}?text=Hi ${request.fullName}, I’m reaching out about adopting ${pets.find(pet => pet.id === request.petId)?.name || 'your pet'}!`}
                     target="_blank"
-                    className="bg-green-600 text-white px-4 py-2 rounded-md font-medium hover:bg-green-700 flex items-center"
+                    className="bg-green-500 text-white px-4 py-2 rounded-md font-medium hover:bg-green-600 flex items-center"
                   >
-                    <FaWhatsapp size={30} className="mr-2" />
+                    <FaWhatsapp
+                      size={35}
+                      className="mr-2" />
                     Message on WhatsApp
                   </a>
                 </div>
@@ -194,7 +181,6 @@ const AdoptionRequestPage: React.FC = () => {
     <div className="bg-gray-100 min-h-screen">
       <Navbar />
       <div className="container mx-auto p-4">
-        <Toaster /> {/* Add Toaster component here */}
         {loading || !isLoaded ? (
           <div className="flex justify-center items-center min-h-[50vh]">
             <p className="text-2xl font-bold text-gray-800">Loading...</p>

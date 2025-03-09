@@ -16,6 +16,7 @@
     "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.3.1",
     "@sendgrid/mail": "^8.1.4",
+    "@types/tailwindcss": "^3.0.11",
     "cloudinary": "^2.5.1",
     "formidable": "^3.5.2",
     "framer-motion": "^12.4.7",
