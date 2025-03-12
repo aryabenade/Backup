@@ -1,6 +1,6 @@
 // app/services/grooming/page.tsx
 import React from "react";
-import {dogPackages, catPackages} from "./data";
+import { dogPackages, catPackages } from "./data";
 import GroomingCard from './GroomingCard';
 
 const GroomingPackages = () => {
@@ -17,6 +17,7 @@ const GroomingPackages = () => {
             price={pkg.price}
             originalPrice={pkg.originalPrice}
             features={pkg.features}
+            petType="Dog" // Explicitly pass "Dog"
           />
         ))}
       </div>
@@ -31,6 +32,7 @@ const GroomingPackages = () => {
             price={pkg.price}
             originalPrice={pkg.originalPrice}
             features={pkg.features}
+            petType="Cat" // Explicitly pass "Cat"
           />
         ))}
       </div>

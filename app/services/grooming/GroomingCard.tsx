@@ -1,6 +1,6 @@
-//app/services/grooming/GroomingCard.tsx
 
-"use client"
+// app/services/grooming/GroomingCard.tsx
+"use client";
 import React, { useState } from "react";
 import Link from "next/link";
 
@@ -9,6 +9,7 @@ type GroomingPackageProps = {
   price: string;
   originalPrice: string;
   features: string[];
+  petType?: string; // Add petType as an optional prop
 };
 
 const GroomingCard: React.FC<GroomingPackageProps> = ({
@@ -16,8 +17,9 @@ const GroomingCard: React.FC<GroomingPackageProps> = ({
   price,
   originalPrice,
   features,
+  petType = "Dog", // Default to "Dog" if not provided
 }) => {
-  const [isLoading, setIsLoading] = useState(false); 
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleClick = () => {
     setIsLoading(true);
@@ -39,7 +41,10 @@ const GroomingCard: React.FC<GroomingPackageProps> = ({
           ))}
         </ul>
       </div>
-      <Link href={`/services/grooming/form?title=${encodeURIComponent(title)}&price=${encodeURIComponent(price)}`} passHref>
+      <Link
+        href={`/services/grooming/form?title=${encodeURIComponent(title)}&price=${encodeURIComponent(price)}&petType=${encodeURIComponent(petType)}`}
+        passHref
+      >
         <button
           className={`mt-6 w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
           onClick={handleClick}

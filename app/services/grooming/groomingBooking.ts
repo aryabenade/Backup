@@ -122,15 +122,3 @@ export async function deleteGroomingBooking(id: number): Promise<GroomingBooking
         throw new Error('Error deleting grooming booking');
     }
 }
-
-// // Action to fetch grooming bookings for a specific city
-// export async function fetchGroomingBookingsCity(city: string): Promise<GroomingBookingData[]> {
-//     try {
-//         const groomingBookings = await prisma.groomingBooking.findMany({
-//             where: { city },
-//         });
-//         return groomingBookings;
-//     } catch (error) {
-//         throw new Error('Error fetching grooming bookings');
-//     }
-// }
