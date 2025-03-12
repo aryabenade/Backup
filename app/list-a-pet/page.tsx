@@ -16,7 +16,7 @@ const ListAPet: React.FC = () => {
   const [pets, setPets] = useState<Pet[]>([]);
   const [popupMessage, setPopupMessage] = useState('');
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [popupAction, setPopupAction] = useState<() => void>(() => { });
+  const [popupAction, setPopupAction] = useState<() => void>(() => {});
   const [loading, setLoading] = useState(true); // Add loading state
 
   const handleConfirmAction = () => {
@@ -129,18 +129,8 @@ const ListAPet: React.FC = () => {
               {pets.map((pet) => (
                 <PetCard
                   key={pet.id}
-                  id={pet.id}
-                  name={pet.name}
-                  age={pet.age}
-                  ageUnit={pet.ageUnit}
-                  petType={pet.petType}
-                  petBreed={pet.petBreed}
-                  state={pet.state}
-                  city={pet.city}
-                  contact={pet.contact}
-                  image={pet.image}
-                  createdAt={pet.createdAt}
-                  onEdit={() => handleEdit(pet)}
+                  pet={pet} // Pass the entire pet object
+                  // onEdit={() => handleEdit(pet)}
                   onDelete={() => handleDeleteClick(pet.id!)}
                 />
               ))}

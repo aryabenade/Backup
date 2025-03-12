@@ -39,9 +39,6 @@ const FavoritesPage: React.FC = () => {
     loadFavorites();
   }, [isLoaded, isSignedIn, user, router]);
 
-  const handleAdopt = (petId: number) => {
-    router.push(`/adopt-a-pet/form?petId=${petId}`);
-  };
 
   const handleToggleFavorite = async (petId: number, isFavorited: boolean) => {
     if (!user || !isFavorited) return;
@@ -62,28 +59,17 @@ const FavoritesPage: React.FC = () => {
     }
 
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-8">
-        {favoritePets.map((pet) => (
-          <PetCard
-            key={pet.id}
-            id={pet.id}
-            name={pet.name}
-            age={pet.age}
-            ageUnit={pet.ageUnit}
-            petType={pet.petType}
-            petBreed={pet.petBreed}
-            state={pet.state}
-            city={pet.city}
-            contact={pet.contact}
-            image={pet.image}
-            createdAt={pet.createdAt}
-            onAdopt={() => pet.id && handleAdopt(pet.id)}
-            isAdoptPage={true}
-            onToggleFavorite={handleToggleFavorite}
-            isFavorited={true}
-          />
-        ))}
-      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {favoritePets.map((pet) => (
+        <PetCard
+          key={pet.id}
+          pet={pet} // Pass the full pet object
+          isAdoptPage={true}
+          onToggleFavorite={handleToggleFavorite}
+          isFavorited={true}
+        />
+      ))}
+    </div>
     );
   };
 

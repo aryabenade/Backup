@@ -1,18 +1,44 @@
 // types.ts in app/
 
+// export interface Pet {
+//   id?: number;
+//   name: string;
+//   petBreed: string;
+//   age: number;
+//   ageUnit: string;
+//   petType: string;
+//   state: string;
+//   city: string;
+//   contact: string;
+//   image: string | null;
+//   userId: string;
+//   createdAt?: Date;  // Add this field
+// }
+
+// app/types.ts
 export interface Pet {
-  id?: number;
+  id?: number; // Optional, as it’s assigned by the database
   name: string;
-  petBreed: string;
   age: number;
   ageUnit: string;
   petType: string;
+  petBreed: string;
   state: string;
   city: string;
   contact: string;
-  image: string | null;
+  image: string | null; // Nullable if no image is uploaded
   userId: string;
-  createdAt?: Date;  // Add this field
+  gender: 'Male' | 'Female'; // Restrict to these values
+  isVaccinated: boolean;
+  shotsUpToDate: string; // Could be a date string or details
+  isNeutered: boolean | null; // Nullable for non-dogs
+  isSpayed: boolean | null; // Nullable for non-cats
+  goodWithDogs: boolean | null; // Nullable
+  goodWithCats: boolean | null; // Nullable
+  goodWithKids: boolean | null; // Nullable
+  reasonForRehoming: string;
+  createdAt?: Date; // Optional, set by the database
+  updatedAt?: Date; // Optional, set by the database
 }
 
 export interface GroomingBookingData {

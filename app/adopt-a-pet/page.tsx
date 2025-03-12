@@ -1,4 +1,5 @@
- // AdoptAPet component in app/adopt-a-pet/page.tsx
+//  // AdoptAPet component in app/adopt-a-pet/page.tsx
+//app/adopt-a-pet/page.tsx
 "use client";
 import React, { useEffect, useState } from 'react';
 import PetCard from '../components/PetCard';
@@ -12,7 +13,7 @@ import { addFavorite, removeFavorite, fetchFavoritesForUser } from '../profile/f
 import toast, { Toaster } from 'react-hot-toast';
 
 const AdoptAPet: React.FC = () => {
-  const { user, isLoaded, isSignedIn } = useUser(); // Add isLoaded and isSignedIn
+  const { user, isLoaded, isSignedIn } = useUser();
   const router = useRouter();
   const [pets, setPets] = useState<Pet[]>([]);
   const [filteredPets, setFilteredPets] = useState<Pet[]>([]);
@@ -23,34 +24,35 @@ const AdoptAPet: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [loading, setLoading] = useState(true);
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
-  const [sortOption, setSortOption] = useState<'newest' | 'oldest' | ''>('');  // Add sorting state
-  
+  const [sortOption, setSortOption] = useState<'newest' | 'oldest' | ''>('');
 
   useEffect(() => {
-    // Wait until Clerk has loaded the user state
-    if (!isLoaded) return; // Do nothing while loading
+    if (!isLoaded) return;
 
-    // If user is not signed in, redirect to sign-in page
     if (!isSignedIn) {
       router.push('/sign-in');
       return;
     }
 
-
     const fetchData = async () => {
       try {
         const petResponse = await fetch('/api/pets');
         if (petResponse.ok) {
-          const data: Pet[] = await petResponse.json();
+          const data: Pet[] = await petResponse.json(); // Fixed typo: used petResponse instead of response
           const otherPets = data.filter(pet => pet.userId !== user.id);
           setPets(otherPets);
           setFilteredPets(otherPets);
+        } else {
+          console.error('Failed to fetch pets:', petResponse.statusText);
+          toast.error('Failed to load pets!', { position: 'bottom-center' });
         }
+
         const favoritePets = await fetchFavoritesForUser(user.id);
         const favoriteIds = new Set(favoritePets.map(pet => pet.id!).filter(id => id !== undefined));
         setFavorites(favoriteIds);
       } catch (error) {
         console.error('Error fetching data:', error);
+        toast.error('Error loading pets!', { position: 'bottom-center' });
       } finally {
         setLoading(false);
       }
@@ -59,9 +61,6 @@ const AdoptAPet: React.FC = () => {
     fetchData();
   }, [user, router, isLoaded, isSignedIn]);
 
-  const handleAdopt = (petId: number) => {
-    router.push(`/adopt-a-pet/form?petId=${petId}`);
-  };
 
   const handleToggleFavorite = async (petId: number, isFavorited: boolean) => {
     if (!user) return;
@@ -149,6 +148,7 @@ const AdoptAPet: React.FC = () => {
                 setSelectedStateId(0);
                 setSelectedCity('');
                 setSortOption('');
+                setFilteredPets(pets); // Reset to original pets list
               }}
               className="absolute top-4 font-semibold right-4 text-orange-500 hover:underline"
             >
@@ -216,18 +216,7 @@ const AdoptAPet: React.FC = () => {
             {filteredPets.map((pet) => (
               <PetCard
                 key={pet.id}
-                id={pet.id}
-                name={pet.name}
-                age={pet.age}
-                ageUnit={pet.ageUnit}
-                petType={pet.petType}
-                petBreed={pet.petBreed}
-                state={pet.state}
-                city={pet.city}
-                contact={pet.contact}
-                image={pet.image}
-                createdAt={pet.createdAt}
-                onAdopt={() => pet.id && handleAdopt(pet.id)}
+                pet={pet} // Pass the entire pet object
                 isAdoptPage={true}
                 onToggleFavorite={handleToggleFavorite}
                 isFavorited={pet.id ? favorites.has(pet.id) : false}

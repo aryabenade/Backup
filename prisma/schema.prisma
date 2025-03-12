@@ -10,6 +10,24 @@ datasource db {
 }
 
 
+// model Pet {
+//   id               Int               @id @default(autoincrement())
+//   name             String
+//   age              Int
+//   ageUnit          String
+//   petType          String
+//   petBreed         String
+//   state            String
+//   city             String
+//   contact          String
+//   image            String?
+//   userId           String
+//   createdAt        DateTime          @default(now())  // Add this line
+//   adoptionRequests AdoptionRequest[]
+//   notifications    Notification[]
+//   favorites        Favorite[]
+// }
+
 model Pet {
   id               Int               @id @default(autoincrement())
   name             String
@@ -20,9 +38,20 @@ model Pet {
   state            String
   city             String
   contact          String
-  image            String?
+  image            String?           // Nullable if no image is uploaded
   userId           String
-  createdAt        DateTime          @default(now())  // Add this line
+  gender           String            // 'Male' or 'Female'
+  isVaccinated     Boolean
+  shotsUpToDate    String?           // Nullable if not vaccinated
+  isNeutered       Boolean?          // Nullable for non-dogs
+  isSpayed         Boolean?          // Nullable for non-cats
+  goodWithDogs     Boolean?          // Nullable
+  goodWithCats     Boolean?          // Nullable
+  goodWithKids     Boolean?          // Nullable
+  reasonForRehoming String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+
   adoptionRequests AdoptionRequest[]
   notifications    Notification[]
   favorites        Favorite[]
