@@ -57,19 +57,40 @@ model Pet {
   favorites        Favorite[]
 }
 
+// model AdoptionRequest {
+//   id            Int      @id @default(autoincrement())
+//   petId         Int
+//   adopterId     String
+//   fullName      String
+//   phoneNumber   String
+//   emailAddress  String
+//   residenceType String
+//   state         String
+//   city          String
+//   profileImage  String?  // Add this field, nullable
+//   createdAt     DateTime @default(now())
+//   updatedAt     DateTime @updatedAt
+
+//   pet Pet @relation(fields: [petId], references: [id])
+// }
+
 model AdoptionRequest {
-  id            Int      @id @default(autoincrement())
-  petId         Int
-  adopterId     String
-  fullName      String
-  phoneNumber   String
-  emailAddress  String
-  residenceType String
-  state         String
-  city          String
-  profileImage  String?  // Add this field, nullable
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                  Int      @id @default(autoincrement())
+  petId               Int
+  adopterId           String
+  fullName            String
+  phoneNumber         String
+  emailAddress        String
+  residenceType       String
+  state               String
+  city                String
+  profileImage        String?
+  reasonForAdoption   String   // New field
+  hasOtherPets        Boolean  // New field
+  otherPetsDescription String? // New field, optional
+  canCoverCosts       Boolean  // New field
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
 
   pet Pet @relation(fields: [petId], references: [id])
 }

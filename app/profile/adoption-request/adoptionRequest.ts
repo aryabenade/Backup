@@ -9,7 +9,21 @@ const prisma = new PrismaClient();
 
 // Action 1: Create an Adoption Request with Notification
 export async function createAdoptionRequest(data: NewAdoptionRequest): Promise<AdoptionRequest> {
-  const { petId, adopterId, fullName, phoneNumber, emailAddress, residenceType,state,city,profileImage } = data;
+  const {
+    petId,
+    adopterId,
+    fullName,
+    phoneNumber,
+    emailAddress,
+    residenceType,
+    state,
+    city,
+    profileImage,
+    reasonForAdoption,
+    hasOtherPets,
+    otherPetsDescription, // Already works with string | null | undefined
+    canCoverCosts,
+  } = data;
 
   try {
     const adoptionRequest = await prisma.adoptionRequest.create({
@@ -22,15 +36,18 @@ export async function createAdoptionRequest(data: NewAdoptionRequest): Promise<A
         residenceType,
         state,
         city,
-        profileImage, // Save profile image to the database
+        profileImage,
+        reasonForAdoption,
+        hasOtherPets,
+        otherPetsDescription: otherPetsDescription ?? null, // Optional: Normalize undefined to null
+        canCoverCosts,
       },
     });
 
-    // Fetch the pet's details to get the owner's userId
     const pet = await prisma.pet.findUnique({ where: { id: petId } });
     if (pet) {
-      const notificationMessage = `You have a new adoption request for ${pet.name}`;
-      await createNotification(pet.userId, pet.id, notificationMessage); // Create the notification for the pet owner
+      const notificationMessage = `You have a new adoption request for ${pet.name} from ${fullName}`;
+      await createNotification(pet.userId, pet.id, notificationMessage);
     }
 
     return adoptionRequest;
@@ -38,7 +55,6 @@ export async function createAdoptionRequest(data: NewAdoptionRequest): Promise<A
     throw new Error('Error creating adoption request');
   }
 }
-
 
 // Action 2: Fetch All Adoption Requests
 export async function fetchAllAdoptionRequests(): Promise<AdoptionRequest[]> {

@@ -132,6 +132,12 @@ const AdoptionRequestPage: React.FC = () => {
                 <p><strong>Residence Type:</strong> {request.residenceType}</p>
                 <p><strong>State:</strong> {request.state}</p>
                 <p><strong>City:</strong> {request.city}</p>
+                <p><strong>Reason for Adoption:</strong> {request.reasonForAdoption}</p>
+                <p><strong>Other Pets:</strong> {request.hasOtherPets ? 'Yes' : 'No'}</p>
+                {request.hasOtherPets && request.otherPetsDescription && (
+                  <p><strong>Other Pets Description:</strong> {request.otherPetsDescription}</p>
+                )}
+                <p><strong>Can Cover Costs:</strong> {request.canCoverCosts ? 'Yes' : 'No'}</p>
                 <p><strong>Requested At:</strong> {new Date(request.createdAt).toLocaleString()}</p>
                 <div className="flex gap-4 mt-4">
                   <a
@@ -187,7 +193,6 @@ const AdoptionRequestPage: React.FC = () => {
       ))}
     </div>
   );
-
   const filteredAdoptionRequests = adoptionRequests.filter((request) => request.petId === activePetId);
 
   return (

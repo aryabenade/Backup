@@ -119,8 +119,22 @@ export interface NewVetBookingData {
   packagePrice: string;
   userId: string; // Add this field
 }
+export interface NewAdoptionRequest {
+  petId: number;
+  adopterId: string;
+  fullName: string;
+  phoneNumber: string;
+  emailAddress: string;
+  residenceType: string;
+  state: string;
+  city: string;
+  profileImage?: string | null; // Already correct
+  reasonForAdoption: string;
+  hasOtherPets: boolean;
+  otherPetsDescription?: string | null; // Change to string | null
+  canCoverCosts: boolean;
+}
 
-// Path: app/types.ts
 export interface AdoptionRequest {
   id: number;
   petId: number;
@@ -131,25 +145,17 @@ export interface AdoptionRequest {
   residenceType: string;
   state: string;
   city: string;
-  createdAt: Date; // Change from string to Date
-  updatedAt: Date; // Change from string to Date
-  profileImage?: string|null// Add this field
+  createdAt: Date;
+  updatedAt: Date;
+  profileImage?: string | null; // Already correct
   pet?: {
     userId: string;
-    name:string,
+    name: string;
   };
-}
-
-export interface NewAdoptionRequest {
-  petId: number;
-  adopterId: string;
-  fullName: string;
-  phoneNumber: string;
-  emailAddress: string;
-  residenceType: string;
-  state: string;
-  city: string;
-  profileImage?: string|null // Add this field
+  reasonForAdoption: string;
+  hasOtherPets: boolean;
+  otherPetsDescription?: string | null; // Change to string | null
+  canCoverCosts: boolean;
 }
 
 // app/types.ts

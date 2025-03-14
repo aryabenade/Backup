@@ -1,4 +1,3 @@
-//app/adopt-a-pet/form/page.tsx
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -27,6 +26,10 @@ const PetAdoptionForm: React.FC = () => {
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedStateId, setSelectedStateId] = useState(0);
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [reasonForAdoption, setReasonForAdoption] = useState('');
+  const [hasOtherPets, setHasOtherPets] = useState<boolean>(false);
+  const [otherPetsDescription, setOtherPetsDescription] = useState<string | null>(null); // Fixed
+  const [canCoverCosts, setCanCoverCosts] = useState<boolean>(false);
 
   // Validation States
   const [fullNameError, setFullNameError] = useState<string | null>(null);
@@ -35,6 +38,9 @@ const PetAdoptionForm: React.FC = () => {
   const [residenceTypeError, setResidenceTypeError] = useState<string | null>(null);
   const [stateError, setStateError] = useState<string | null>(null);
   const [cityError, setCityError] = useState<string | null>(null);
+  const [reasonError, setReasonError] = useState<string | null>(null);
+  const [otherPetsError, setOtherPetsError] = useState<string | null>(null);
+  const [costsError, setCostsError] = useState<string | null>(null);
 
   // Refs for scrolling
   const fullNameRef = useRef<HTMLInputElement>(null);
@@ -43,6 +49,9 @@ const PetAdoptionForm: React.FC = () => {
   const residenceTypeRef = useRef<HTMLSelectElement>(null);
   const stateRef = useRef<HTMLDivElement>(null);
   const cityRef = useRef<HTMLDivElement>(null);
+  const reasonRef = useRef<HTMLTextAreaElement>(null);
+  const otherPetsRef = useRef<HTMLSelectElement>(null);
+  const costsRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (user) {
@@ -85,6 +94,9 @@ const PetAdoptionForm: React.FC = () => {
     setResidenceTypeError(null);
     setStateError(null);
     setCityError(null);
+    setReasonError(null);
+    setOtherPetsError(null);
+    setCostsError(null);
 
     let isValid = true;
 
@@ -126,6 +138,21 @@ const PetAdoptionForm: React.FC = () => {
       isValid = false;
       if (!fullNameError && !phoneNumberError && !emailAddressError && !residenceTypeError && !stateError) cityRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
+    if (!reasonForAdoption) {
+      setReasonError('Please explain why you want to adopt this pet.');
+      isValid = false;
+      if (!fullNameError && !phoneNumberError && !emailAddressError && !residenceTypeError && !stateError && !cityError) reasonRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (hasOtherPets && !otherPetsDescription) {
+      setOtherPetsError('Please describe your other pets.');
+      isValid = false;
+      if (!fullNameError && !phoneNumberError && !emailAddressError && !residenceTypeError && !stateError && !cityError && !reasonError) otherPetsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (!canCoverCosts) {
+      setCostsError('You must agree to cover veterinary costs and ongoing care.');
+      isValid = false;
+      if (!fullNameError && !phoneNumberError && !emailAddressError && !residenceTypeError && !stateError && !cityError && !reasonError && !otherPetsError) costsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
 
     if (!isValid) return;
 
@@ -145,6 +172,10 @@ const PetAdoptionForm: React.FC = () => {
       state: selectedState,
       city: selectedCity,
       profileImage,
+      reasonForAdoption,
+      hasOtherPets,
+      otherPetsDescription: hasOtherPets ? otherPetsDescription : null,
+      canCoverCosts,
     };
 
     try {
@@ -163,6 +194,10 @@ const PetAdoptionForm: React.FC = () => {
           state: newAdoptionRequest.state,
           city: newAdoptionRequest.city,
           profileImage: newAdoptionRequest.profileImage,
+          reasonForAdoption: newAdoptionRequest.reasonForAdoption,
+          hasOtherPets: newAdoptionRequest.hasOtherPets,
+          otherPetsDescription: newAdoptionRequest.otherPetsDescription,
+          canCoverCosts: newAdoptionRequest.canCoverCosts,
         }),
       });
 
@@ -277,6 +312,67 @@ const PetAdoptionForm: React.FC = () => {
                 </label>
                 <CityDropdown stateId={selectedStateId} selectedCity={selectedCity} onCityChange={setSelectedCity} />
                 {cityError && <p className="text-red-500 text-xs italic">{cityError}</p>}
+              </div>
+              <div>
+                <label htmlFor="reasonForAdoption" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                  Why do you want to adopt this pet?
+                </label>
+                <textarea
+                  ref={reasonRef}
+                  id="reasonForAdoption"
+                  value={reasonForAdoption}
+                  onChange={(e) => setReasonForAdoption(e.target.value)}
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${reasonError ? 'border-red-500' : ''}`}
+                  placeholder="Tell us why you’re interested in this pet"
+                  rows={4}
+                />
+                {reasonError && <p className="text-red-500 text-xs italic">{reasonError}</p>}
+              </div>
+              <div>
+                <label htmlFor="hasOtherPets" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                  Do you have other pets?
+                </label>
+                <select
+                  ref={otherPetsRef}
+                  id="hasOtherPets"
+                  value={hasOtherPets ? 'Yes' : 'No'}
+                  onChange={(e) => {
+                    const hasPets = e.target.value === 'Yes';
+                    setHasOtherPets(hasPets);
+                    if (!hasPets) setOtherPetsDescription(null);
+                  }}
+                  className={`shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${otherPetsError ? 'border-red-500' : ''}`}
+                >
+                  <option value="No">No</option>
+                  <option value="Yes">Yes</option>
+                </select>
+                {hasOtherPets && (
+                  <textarea
+                    value={otherPetsDescription || ''} // Handle null
+                    onChange={(e) => setOtherPetsDescription(e.target.value)}
+                    className={`mt-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline ${otherPetsError ? 'border-red-500' : ''}`}
+                    placeholder="Please describe your other pets"
+                    rows={3}
+                  />
+                )}
+                {otherPetsError && <p className="text-red-500 text-xs italic">{otherPetsError}</p>}
+              </div>
+              <div>
+                <label className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
+                  Are you prepared to cover veterinary costs and ongoing care?
+                </label>
+                <div className="flex items-center">
+                  <input
+                    ref={costsRef}
+                    type="checkbox"
+                    id="canCoverCosts"
+                    checked={canCoverCosts}
+                    onChange={(e) => setCanCoverCosts(e.target.checked)}
+                    className="mr-2"
+                  />
+                  <label htmlFor="canCoverCosts" className="text-gray-700">Yes</label>
+                </div>
+                {costsError && <p className="text-red-500 text-xs italic">{costsError}</p>}
               </div>
               <FormReminder message="Your information will be sent to the pet owner, who will review your request. If the owner is interested, they will contact you for the next steps. Thank you for considering giving a pet a new loving home!" />
               <div className="flex items-center justify-between">
