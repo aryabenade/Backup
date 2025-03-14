@@ -32,7 +32,6 @@ const GroomingBookingForm: React.FC = () => {
     const [breedOptions, setBreedOptions] = useState<{ label: string, value: string }[]>([]);
     const [selectedCity, setSelectedCity] = useState<{ label: string, value: string } | null>(null);
     const [phoneNumber, setPhoneNumber] = useState('');
-
     const { user } = useUser();
 
     const [nameError, setNameError] = useState<string | null>(null);
@@ -44,7 +43,6 @@ const GroomingBookingForm: React.FC = () => {
     const [addressError, setAddressError] = useState<string | null>(null);
     const [phoneNumberError, setPhoneNumberError] = useState<string | null>(null);
 
-    // Refs for scrolling to errors
     const nameRef = useRef<HTMLInputElement>(null);
     const emailRef = useRef<HTMLInputElement>(null);
     const dateRef = useRef<HTMLInputElement>(null);
@@ -72,26 +70,6 @@ const GroomingBookingForm: React.FC = () => {
     ];
 
     useEffect(() => {
-        if (searchPetType) {
-            setPetType(searchPetType);
-        }
-    }, [searchPetType]);
-
-    useEffect(() => {
-        if (petType === 'Cat') {
-            setBreedOptions(catBreeds.map(breed => ({ label: breed, value: breed })));
-        } else if (petType === 'Dog') {
-            setBreedOptions(dogBreeds.map(breed => ({ label: breed, value: breed })));
-        }
-    }, [petType]);
-
-    useEffect(() => {
-        if (date && selectedCity) {
-            fetchBookedSlots(date, selectedCity.value).then(setBookedSlots);
-        }
-    }, [date, selectedCity]);
-
-    useEffect(() => {
         const storedOrder = sessionStorage.getItem('repeatOrder');
         if (storedOrder) {
             const orderData = JSON.parse(storedOrder);
@@ -106,11 +84,28 @@ const GroomingBookingForm: React.FC = () => {
             setPetAge(orderData.petAge);
             setSelectedCity({ label: orderData.city, value: orderData.city });
             setAddress(orderData.address);
+            setPetType(orderData.petType); // Set petType from repeat order
             if (!searchTitle) setTitle(orderData.packageTitle);
             if (!searchPrice) setPrice(orderData.packagePrice);
             sessionStorage.removeItem('repeatOrder');
+        } else if (searchPetType) {
+            setPetType(searchPetType); // Fallback to search params if no repeat order
         }
-    }, [searchTitle, searchPrice]);
+    }, [searchTitle, searchPrice, searchPetType]);
+
+    useEffect(() => {
+        if (petType === 'Cat') {
+            setBreedOptions(catBreeds.map(breed => ({ label: breed, value: breed })));
+        } else if (petType === 'Dog') {
+            setBreedOptions(dogBreeds.map(breed => ({ label: breed, value: breed })));
+        }
+    }, [petType]);
+
+    useEffect(() => {
+        if (date && selectedCity) {
+            fetchBookedSlots(date, selectedCity.value).then(setBookedSlots);
+        }
+    }, [date, selectedCity]);
 
     const isSlotDisabled = (slot: string) => {
         if (!date) return true;
@@ -310,12 +305,13 @@ const GroomingBookingForm: React.FC = () => {
                         <input
                             type="text"
                             id="petType"
-                            value={petType || 'Select a package first'}
+                            value={petType || 'Select a package first'} // Display petType or fallback message
                             readOnly
                             className="mt-1 p-2 w-full border border-gray-300 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
                         />
                     </div>
 
+                    {/* Rest of the form remains unchanged */}
                     <div>
                         <label htmlFor="petName" className="block text-sm font-medium text-gray-700" style={{ fontWeight: '500', fontSize: '1rem' }}>
                             Name of your pet?
@@ -395,13 +391,13 @@ const GroomingBookingForm: React.FC = () => {
                     </div>
 
                     <div>
-                         <label htmlFor="petAge" className="block text-sm font-medium text-gray-700" style={{ fontWeight: '500', fontSize: '1rem' }}>How old is your pet?</label>
-                          <select id="petAge" value={petAge} onChange={(e) => setPetAge(e.target.value)} className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow appearance-none">
-                              <option value="< 3 months">&lt; 3 months</option>
-                              <option value="< 11 years">&lt; 11 years</option>
-                              <option value="11+ years">11+ years</option>
-                          </select>
-                      </div>
+                        <label htmlFor="petAge" className="block text-sm font-medium text-gray-700" style={{ fontWeight: '500', fontSize: '1rem' }}>How old is your pet?</label>
+                        <select id="petAge" value={petAge} onChange={(e) => setPetAge(e.target.value)} className="mt-1 p-2 w-full border border-gray-300 rounded-md shadow appearance-none">
+                            <option value="< 3 months">&lt; 3 months</option>
+                            <option value="< 11 years">&lt; 11 years</option>
+                            <option value="11+ years">11+ years</option>
+                        </select>
+                    </div>
 
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700" style={{ fontWeight: '500', fontSize: '1rem' }}>
@@ -487,7 +483,6 @@ const GroomingBookingForm: React.FC = () => {
                             Preferred Date
                         </label>
                         <DatePicker
-                            // ref={dateRef}
                             selected={date}
                             onChange={(date) => setDate(date)}
                             dateFormat="MMMM d, yyyy"

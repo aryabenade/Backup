@@ -16,11 +16,13 @@
     "@heroicons/react": "^2.2.0",
     "@prisma/client": "^6.3.1",
     "@sendgrid/mail": "^8.1.4",
+    "@stripe/stripe-js": "^6.0.0",
     "@types/tailwindcss": "^3.0.11",
     "cloudinary": "^2.5.1",
     "formidable": "^3.5.2",
     "framer-motion": "^12.4.7",
     "fuse.js": "^7.1.0",
+    "micro": "^10.0.1",
     "next": "15.1.5",
     "nodemailer": "^6.9.16",
     "react": "^19.0.0",
@@ -30,6 +32,7 @@
     "react-icons": "^5.4.0",
     "react-select": "^5.10.0",
     "react-spinners": "^0.15.0",
+    "stripe": "^17.7.0",
     "twilio": "^5.4.4"
   },
   "devDependencies": {

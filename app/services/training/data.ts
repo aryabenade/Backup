@@ -1,3 +1,4 @@
+////app/services/training/data.ts
 export const dogTrainingPackages = [
     {
       title: "Basic Obedience",

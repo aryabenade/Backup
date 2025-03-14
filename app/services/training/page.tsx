@@ -1,3 +1,4 @@
+//app/services/training/page.tsx
 import React from "react";
 import { dogTrainingPackages, catTrainingPackages } from "./data";
 import TrainingCard from "@/app/services/training/TrainingCard"; // Import the new component

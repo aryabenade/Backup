@@ -1,3 +1,4 @@
+// //app/services/vet/form/page.tsx
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -17,7 +18,7 @@ const VetBookingForm: React.FC = () => {
     const [email, setEmail] = useState('');
     const [date, setDate] = useState<Date | null>(null);
     const [timeSlot, setTimeSlot] = useState('');
-    const [consultationType, setConsultationType] = useState(''); // Set from URL
+    const [consultationType, setConsultationType] = useState(''); // Set from URL or repeat order
     const [petType, setPetType] = useState('Cat');
     const [petIssues, setPetIssues] = useState<string[]>([]);
     const [medicalAttention, setMedicalAttention] = useState('');
@@ -75,19 +76,6 @@ const VetBookingForm: React.FC = () => {
         "04:00 PM - 06:00 PM",
     ];
 
-    // Set consultationType from URL parameter
-    useEffect(() => {
-        if (searchConsultationType) {
-            setConsultationType(searchConsultationType);
-        }
-    }, [searchConsultationType]);
-
-    useEffect(() => {
-        if (date && selectedCity) {
-            fetchBookedSlots(date, selectedCity.value).then(setBookedSlots);
-        }
-    }, [date, selectedCity]);
-
     useEffect(() => {
         const storedOrder = sessionStorage.getItem('repeatOrder');
         if (storedOrder) {
@@ -100,11 +88,20 @@ const VetBookingForm: React.FC = () => {
             setMedicalAttention(orderData.medicalAttention);
             setSelectedCity({ label: orderData.city, value: orderData.city });
             setAddress(orderData.address);
+            setConsultationType(orderData.consultationType); // Set consultationType from repeat order
             if (!searchTitle) setTitle(orderData.packageTitle);
             if (!searchPrice) setPrice(orderData.packagePrice);
             sessionStorage.removeItem('repeatOrder');
+        } else if (searchConsultationType) {
+            setConsultationType(searchConsultationType); // Fallback to search params if no repeat order
         }
-    }, [searchTitle, searchPrice]);
+    }, [searchTitle, searchPrice, searchConsultationType]);
+
+    useEffect(() => {
+        if (date && selectedCity) {
+            fetchBookedSlots(date, selectedCity.value).then(setBookedSlots);
+        }
+    }, [date, selectedCity]);
 
     const isSlotDisabled = (slot: string) => {
         if (!date) return true;
