@@ -1,6 +1,4 @@
-//app/services/vet/VetCard.tsx
-
-"use client"
+"use client";
 import React, { useState } from "react";
 import Link from "next/link";
 
@@ -9,6 +7,7 @@ type VetPackageProps = {
   price: string;
   originalPrice: string;
   features: string[];
+  consultationType?: string; // Add consultationType as an optional prop
 };
 
 const VetCard: React.FC<VetPackageProps> = ({
@@ -16,6 +15,7 @@ const VetCard: React.FC<VetPackageProps> = ({
   price,
   originalPrice,
   features,
+  consultationType = "Home Consultation", // Default to Home if not specified
 }) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -39,7 +39,10 @@ const VetCard: React.FC<VetPackageProps> = ({
           ))}
         </ul>
       </div>
-      <Link href={`/services/vet/form?title=${encodeURIComponent(title)}&price=${encodeURIComponent(price)}`} passHref>
+      <Link
+        href={`/services/vet/form?title=${encodeURIComponent(title)}&price=${encodeURIComponent(price)}&consultationType=${encodeURIComponent(consultationType)}`}
+        passHref
+      >
         <button
           className={`mt-6 w-full bg-orange-500 text-white py-2 rounded-lg hover:bg-orange-600 transition ${isLoading ? "opacity-50 cursor-not-allowed" : ""}`}
           onClick={handleClick}

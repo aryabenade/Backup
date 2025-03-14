@@ -1,4 +1,4 @@
-// app/list-a-pet/form/page.tsx
+//app/list-a-pet/form/page.tsx
 "use client";
 
 import React, { useEffect, useState, useRef } from 'react';
@@ -17,9 +17,8 @@ import CityDropdown from '@/app/components/CityDropdown';
 const PetListingForm: React.FC = () => {
   const { user } = useUser();
   const router = useRouter();
-  const [step, setStep] = useState(1); // Step 1: Pet Details, Step 2: Owner Details
+  const [step, setStep] = useState(1);
 
-  // Form state
   const [petName, setPetName] = useState('');
   const [ownerName, setOwnerName] = useState(user?.fullName || '');
   const [age, setAge] = useState('');
@@ -45,7 +44,6 @@ const PetListingForm: React.FC = () => {
   const [goodWithKids, setGoodWithKids] = useState<boolean | null>(null);
   const [reasonForRehoming, setReasonForRehoming] = useState('');
 
-  // Validation states
   const [petNameError, setPetNameError] = useState<string | null>(null);
   const [ownerNameError, setOwnerNameError] = useState<string | null>(null);
   const [ageError, setAgeError] = useState<string | null>(null);
@@ -60,7 +58,6 @@ const PetListingForm: React.FC = () => {
   const [spayedError, setSpayedError] = useState<string | null>(null);
   const [reasonError, setReasonError] = useState<string | null>(null);
 
-  // Refs for scrolling to errors
   const petNameRef = useRef<HTMLInputElement>(null);
   const ageRef = useRef<HTMLInputElement>(null);
   const petBreedRef = useRef<HTMLDivElement>(null);
@@ -81,11 +78,8 @@ const PetListingForm: React.FC = () => {
   };
 
   useEffect(() => {
-    if (petType === 'Cat') {
-      setBreedOptions(catBreeds.map(breed => ({ label: breed, value: breed })));
-    } else if (petType === 'Dog') {
-      setBreedOptions(dogBreeds.map(breed => ({ label: breed, value: breed })));
-    }
+    if (petType === 'Cat') setBreedOptions(catBreeds.map(breed => ({ label: breed, value: breed })));
+    else if (petType === 'Dog') setBreedOptions(dogBreeds.map(breed => ({ label: breed, value: breed })));
   }, [petType]);
 
   const handleImageUpload = async (file: File): Promise<string> => {
@@ -93,11 +87,7 @@ const PetListingForm: React.FC = () => {
       const formData = new FormData();
       formData.append('file', file);
       formData.append('upload_preset', 'my_upload_preset');
-      const response = await fetch('/api/uploadImage', {
-        method: 'POST',
-        body: formData,
-      });
-
+      const response = await fetch('/api/uploadImage', { method: 'POST', body: formData });
       if (!response.ok) throw new Error(`Image upload failed with status: ${response.status}`);
       const data = await response.json();
       return data.url;
@@ -225,9 +215,7 @@ const PetListingForm: React.FC = () => {
   };
 
   const handleNext = () => {
-    if (step === 1 && validateStep1()) {
-      setStep(2);
-    }
+    if (step === 1 && validateStep1()) setStep(2);
   };
 
   const handleBack = () => {
@@ -241,7 +229,7 @@ const PetListingForm: React.FC = () => {
     let imageUrl: string | null = null;
     try {
       setLoading(true);
-      if (image) { imageUrl = await handleImageUpload(image); }
+      if (image) imageUrl = await handleImageUpload(image);
       if (!user?.id) { setError('User is not authenticated'); return; }
 
       const newPet: Pet = {
@@ -304,7 +292,6 @@ const PetListingForm: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             {error && <div className="text-center text-red-500 text-sm mb-4">{error}</div>}
 
-            {/* Step 1: Pet Details */}
             {step === 1 && (
               <div>
                 <h2 className="text-lg font-semibold text-gray-700 mb-2">Pet Details</h2>
@@ -518,7 +505,6 @@ const PetListingForm: React.FC = () => {
               </div>
             )}
 
-            {/* Step 2: Owner Details */}
             {step === 2 && (
               <div>
                 <h2 className="text-lg font-semibold text-gray-700 mb-2">Owner Details</h2>
@@ -568,7 +554,6 @@ const PetListingForm: React.FC = () => {
                     {contactError && <p className="text-red-500 text-xs italic">{contactError}</p>}
                   </div>
                 </div>
-                {/* <FormReminder message="You'll receive adoption requests via email from potential adopters. Keep an eye on your inbox to review and respond to these requests. Thank you for helping give your pet a new loving home!" /> */}
                 <div className="flex justify-between mt-6">
                   <button
                     type="button"

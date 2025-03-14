@@ -1,7 +1,7 @@
-// PetAdoptionForm component in app/adopt-a-pet/form/page.tsx
+//app/adopt-a-pet/form/page.tsx
 "use client";
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
 import toast, { Toaster } from 'react-hot-toast';
@@ -26,7 +26,7 @@ const PetAdoptionForm: React.FC = () => {
   const [selectedState, setSelectedState] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedStateId, setSelectedStateId] = useState(0);
-  const [profileImage, setProfileImage] = useState<string | null>(null); // Add state for profile image
+  const [profileImage, setProfileImage] = useState<string | null>(null);
 
   // Validation States
   const [fullNameError, setFullNameError] = useState<string | null>(null);
@@ -36,33 +36,33 @@ const PetAdoptionForm: React.FC = () => {
   const [stateError, setStateError] = useState<string | null>(null);
   const [cityError, setCityError] = useState<string | null>(null);
 
-  // Pre-fill form fields with Clerk user data
+  // Refs for scrolling
+  const fullNameRef = useRef<HTMLInputElement>(null);
+  const phoneNumberRef = useRef<HTMLInputElement>(null);
+  const emailAddressRef = useRef<HTMLInputElement>(null);
+  const residenceTypeRef = useRef<HTMLSelectElement>(null);
+  const stateRef = useRef<HTMLDivElement>(null);
+  const cityRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (user) {
       const userFullName = user.fullName || `${user.firstName || ''} ${user.lastName || ''}`.trim();
       if (userFullName) setFullName(userFullName);
-
       const userEmail = user.primaryEmailAddress?.emailAddress;
       if (userEmail) setEmailAddress(userEmail);
-
       const userProfileImage = user.imageUrl;
       if (userProfileImage) setProfileImage(userProfileImage);
-
       const primaryPhone = user.phoneNumbers?.find(phone => phone.id === user.primaryPhoneNumberId)?.phoneNumber;
       const phone = primaryPhone || user.phoneNumbers?.[0]?.phoneNumber;
-      if (phone) {
-        const cleanedPhone = phone.replace(/\D/g, '').slice(-10);
-        setPhoneNumber(cleanedPhone);
-      }
+      if (phone) setPhoneNumber(phone.replace(/\D/g, '').slice(-10));
     }
   }, [user]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const id = urlParams.get('petId');
-    if (id) {
-      setPetId(id);
-    } else {
+    if (id) setPetId(id);
+    else {
       setError('Pet ID is missing');
       toast.error('Pet ID is missing', { position: 'bottom-center' });
     }
@@ -73,15 +73,8 @@ const PetAdoptionForm: React.FC = () => {
     setSelectedStateId(stateId);
   };
 
-  const validateEmail = (email: string) => {
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(email);
-  };
-
-  const validatePhoneNumber = (number: string) => {
-    const regex = /^[0-9]{10}$/;
-    return regex.test(number);
-  };
+  const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const validatePhoneNumber = (number: string) => /^[0-9]{10}$/.test(number);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,7 +83,6 @@ const PetAdoptionForm: React.FC = () => {
     setPhoneNumberError(null);
     setEmailAddressError(null);
     setResidenceTypeError(null);
-    setError(null);
     setStateError(null);
     setCityError(null);
 
@@ -99,37 +91,43 @@ const PetAdoptionForm: React.FC = () => {
     if (!fullName) {
       setFullNameError('Full Name is required.');
       isValid = false;
+      fullNameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     if (!phoneNumber) {
       setPhoneNumberError('Phone Number is required.');
       isValid = false;
+      if (!fullNameError) phoneNumberRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else if (!validatePhoneNumber(phoneNumber)) {
       setPhoneNumberError('Phone Number must be 10 digits.');
       isValid = false;
+      if (!fullNameError) phoneNumberRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     if (!emailAddress) {
       setEmailAddressError('Email Address is required.');
       isValid = false;
+      if (!fullNameError && !phoneNumberError) emailAddressRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     } else if (!validateEmail(emailAddress)) {
       setEmailAddressError('Please enter a valid email address.');
       isValid = false;
+      if (!fullNameError && !phoneNumberError) emailAddressRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     if (!residenceType) {
       setResidenceTypeError('Type of Residence is required.');
       isValid = false;
+      if (!fullNameError && !phoneNumberError && !emailAddressError) residenceTypeRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     if (!selectedState) {
       setStateError('State is required.');
       isValid = false;
+      if (!fullNameError && !phoneNumberError && !emailAddressError && !residenceTypeError) stateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
     if (!selectedCity) {
       setCityError('City is required.');
       isValid = false;
+      if (!fullNameError && !phoneNumberError && !emailAddressError && !residenceTypeError && !stateError) cityRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    if (!isValid) {
-      return;
-    }
+    if (!isValid) return;
 
     if (!user?.id || !petId) {
       setError('User is not authenticated or pet ID is missing');
@@ -146,7 +144,7 @@ const PetAdoptionForm: React.FC = () => {
       residenceType,
       state: selectedState,
       city: selectedCity,
-      profileImage, // Include profile image
+      profileImage,
     };
 
     try {
@@ -164,16 +162,14 @@ const PetAdoptionForm: React.FC = () => {
           residenceType: newAdoptionRequest.residenceType,
           state: newAdoptionRequest.state,
           city: newAdoptionRequest.city,
-          profileImage: newAdoptionRequest.profileImage, // Include profile image in email
+          profileImage: newAdoptionRequest.profileImage,
         }),
       });
 
       setFormSubmitted(true);
       setError(null);
       toast.success('Adoption request submitted successfully!', { position: 'bottom-center' });
-      setTimeout(() => {
-        router.push('/adopt-a-pet');
-      }, 2000);
+      setTimeout(() => router.push('/adopt-a-pet'), 2000);
     } catch (err: any) {
       setError(`Failed to submit adoption request: ${err instanceof Error ? err.message : 'An unknown error occurred'}`);
       toast.error(`Failed to submit adoption request: ${err instanceof Error ? err.message : 'An unknown error occurred'}`, { position: 'bottom-center' });
@@ -186,9 +182,7 @@ const PetAdoptionForm: React.FC = () => {
     <div className="min-h-screen bg-gray-100 py-6 flex items-center justify-center">
       <Toaster position="top-center" />
       <div className="container max-w-md bg-white shadow-md rounded-lg p-8">
-        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
-          Adopt a Pet
-        </h1>
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">Adopt a Pet</h1>
         {formSubmitted ? (
           <div className="text-center text-green-600 text-lg mb-6">
             <BeatLoader color="#36D7B7" size={16} />
@@ -202,23 +196,18 @@ const PetAdoptionForm: React.FC = () => {
                   src={profileImage}
                   alt="User Profile"
                   className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/placeholder-profile.png';
-                  }}
+                  onError={(e) => (e.target as HTMLImageElement).src = '/placeholder-profile.png'}
                 />
               </div>
             )}
             <form onSubmit={handleSubmit} className="space-y-6">
-              {error && (
-                <div className="text-center text-red-500 text-sm mb-4">
-                  {error}
-                </div>
-              )}
+              {error && <div className="text-center text-red-500 text-sm mb-4">{error}</div>}
               <div>
                 <label htmlFor="fullName" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
                   Full Name
                 </label>
                 <input
+                  ref={fullNameRef}
                   type="text"
                   id="fullName"
                   value={fullName}
@@ -233,6 +222,7 @@ const PetAdoptionForm: React.FC = () => {
                   Phone Number
                 </label>
                 <input
+                  ref={phoneNumberRef}
                   type="tel"
                   id="phoneNumber"
                   value={phoneNumber}
@@ -247,6 +237,7 @@ const PetAdoptionForm: React.FC = () => {
                   Email Address
                 </label>
                 <input
+                  ref={emailAddressRef}
                   type="email"
                   id="emailAddress"
                   value={emailAddress}
@@ -261,6 +252,7 @@ const PetAdoptionForm: React.FC = () => {
                   Type of Residence
                 </label>
                 <select
+                  ref={residenceTypeRef}
                   id="residenceType"
                   value={residenceType}
                   onChange={(e) => setResidenceType(e.target.value)}
@@ -272,23 +264,21 @@ const PetAdoptionForm: React.FC = () => {
                 </select>
                 {residenceTypeError && <p className="text-red-500 text-xs italic">{residenceTypeError}</p>}
               </div>
-              <div>
+              <div ref={stateRef}>
                 <label htmlFor="state" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
                   State
                 </label>
                 <StateDropdown selectedState={selectedState} onStateChange={handleStateChange} />
                 {stateError && <p className="text-red-500 text-xs italic">{stateError}</p>}
               </div>
-              <div>
+              <div ref={cityRef}>
                 <label htmlFor="city" className="block text-gray-700 text-sm font-bold mb-2" style={{ fontWeight: '500', fontSize: '1rem' }}>
                   City
                 </label>
                 <CityDropdown stateId={selectedStateId} selectedCity={selectedCity} onCityChange={setSelectedCity} />
                 {cityError && <p className="text-red-500 text-xs italic">{cityError}</p>}
               </div>
-              <FormReminder message="Your information will be sent to the pet owner, who will review your request.
-                If the owner is interested, they will contact you for the next steps. 
-                Thank you for considering giving a pet a new loving home!" />
+              <FormReminder message="Your information will be sent to the pet owner, who will review your request. If the owner is interested, they will contact you for the next steps. Thank you for considering giving a pet a new loving home!" />
               <div className="flex items-center justify-between">
                 <button
                   type="submit"

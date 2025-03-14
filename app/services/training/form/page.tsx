@@ -1,7 +1,7 @@
 //app/services/training/form/page.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -41,7 +41,6 @@ const TrainingBookingForm: React.FC = () => {
   const [title, setTitle] = useState(searchTitle);
   const [price, setPrice] = useState(searchPrice);
 
-  // Error states
   const [nameError, setNameError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [phoneNumberError, setPhoneNumberError] = useState<string | null>(null);
@@ -51,39 +50,36 @@ const TrainingBookingForm: React.FC = () => {
   const [petBreedError, setPetBreedError] = useState<string | null>(null);
   const [addressError, setAddressError] = useState<string | null>(null);
 
+  const nameRef = useRef<HTMLInputElement>(null);
+  const emailRef = useRef<HTMLInputElement>(null);
+  const phoneNumberRef = useRef<HTMLInputElement>(null);
+  const startDateRef = useRef<HTMLInputElement>(null);
+  const preferredDaysRef = useRef<HTMLDivElement>(null);
+  const petNameRef = useRef<HTMLInputElement>(null);
+  const petBreedRef = useRef<HTMLDivElement>(null);
+  const addressRef = useRef<HTMLInputElement>(null);
+  const cityRef = useRef<HTMLDivElement>(null);
+
   const daysOfWeek = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   const searchSessionsPerWeek = parseInt(searchParams?.get("sessionsPerWeek") || "2", 10);
   const [sessionsPerWeek, setSessionsPerWeek] = useState(searchSessionsPerWeek);
 
-  // Set petType based on package title and lock it
   useEffect(() => {
     const dogPackageTitles = dogTrainingPackages.map((pkg) => pkg.title);
     const catPackageTitles = catTrainingPackages.map((pkg) => pkg.title);
-
-    if (dogPackageTitles.includes(searchTitle)) {
-      setPetType("Dog");
-    } else if (catPackageTitles.includes(searchTitle)) {
-      setPetType("Cat");
-    }
+    if (dogPackageTitles.includes(searchTitle)) setPetType("Dog");
+    else if (catPackageTitles.includes(searchTitle)) setPetType("Cat");
   }, [searchTitle]);
 
-  // Set breed options based on pet type
   useEffect(() => {
-    if (petType === "Cat") {
-      setBreedOptions(catBreeds.map((breed) => ({ label: breed, value: breed })));
-    } else {
-      setBreedOptions(dogBreeds.map((breed) => ({ label: breed, value: breed })));
-    }
+    if (petType === "Cat") setBreedOptions(catBreeds.map((breed) => ({ label: breed, value: breed })));
+    else setBreedOptions(dogBreeds.map((breed) => ({ label: breed, value: breed })));
   }, [petType]);
 
-  // Fetch booked days when start date or city changes
   useEffect(() => {
-    if (startDate && selectedCity) {
-      fetchTrainingBookedDays(startDate, selectedCity.value).then(setBookedDays);
-    }
+    if (startDate && selectedCity) fetchTrainingBookedDays(startDate, selectedCity.value).then(setBookedDays);
   }, [startDate, selectedCity]);
 
-  // Pre-fill form from sessionStorage if repeating an order
   useEffect(() => {
     const storedOrder = sessionStorage.getItem("repeatOrder");
     if (storedOrder) {
@@ -106,7 +102,6 @@ const TrainingBookingForm: React.FC = () => {
     }
   }, [searchTitle, searchPrice]);
 
-  // Check if a day is fully booked
   const isDayDisabled = (day: string) => {
     if (!startDate || !selectedCity) return false;
     const dateKey = startDate.toISOString().split("T")[0];
@@ -114,16 +109,11 @@ const TrainingBookingForm: React.FC = () => {
     return bookingsForDate.includes(day);
   };
 
-  // Handle preferred days selection
   const handleDayToggle = (day: string) => {
-    if (preferredDays.includes(day)) {
-      setPreferredDays(preferredDays.filter((d) => d !== day));
-    } else if (preferredDays.length < sessionsPerWeek && !isDayDisabled(day)) {
-      setPreferredDays([...preferredDays, day]);
-    }
+    if (preferredDays.includes(day)) setPreferredDays(preferredDays.filter((d) => d !== day));
+    else if (preferredDays.length < sessionsPerWeek && !isDayDisabled(day)) setPreferredDays([...preferredDays, day]);
   };
 
-  // Validation functions
   const validateEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
   const validatePhoneNumber = (number: string) => /^[0-9]{10}$/.test(number);
 
@@ -141,22 +131,61 @@ const TrainingBookingForm: React.FC = () => {
 
     let isValid = true;
 
-    if (!name) { setNameError("Your Name is required."); isValid = false; }
-    if (!phoneNumber) {
-      setPhoneNumberError("Phone Number is required."); isValid = false;
-    } else if (!validatePhoneNumber(phoneNumber)) {
-      setPhoneNumberError("Phone Number must be 10 digits."); isValid = false;
+    if (!name) {
+      setNameError("Your Name is required.");
+      isValid = false;
+      nameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
-    if (!email) { setEmailError("Your Email is required."); isValid = false; }
-    else if (!validateEmail(email)) { setEmailError("Please enter a valid email."); isValid = false; }
-    if (!startDate) { setStartDateError("Start Date is required."); isValid = false; }
-    else if (startDate < new Date()) { setStartDateError("Start Date must be in the future."); isValid = false; }
+    if (!phoneNumber) {
+      setPhoneNumberError("Phone Number is required.");
+      isValid = false;
+      if (!nameError) phoneNumberRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (!validatePhoneNumber(phoneNumber)) {
+      setPhoneNumberError("Phone Number must be 10 digits.");
+      isValid = false;
+      if (!nameError) phoneNumberRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (!email) {
+      setEmailError("Your Email is required.");
+      isValid = false;
+      if (!nameError && !phoneNumberError) emailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (!validateEmail(email)) {
+      setEmailError("Please enter a valid email.");
+      isValid = false;
+      if (!nameError && !phoneNumberError) emailRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (!startDate) {
+      setStartDateError("Start Date is required.");
+      isValid = false;
+      if (!nameError && !phoneNumberError && !emailError) startDateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (startDate < new Date()) {
+      setStartDateError("Start Date must be in the future.");
+      isValid = false;
+      if (!nameError && !phoneNumberError && !emailError) startDateRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
     if (preferredDays.length !== sessionsPerWeek) {
       setPreferredDaysError(`Select exactly ${sessionsPerWeek} preferred day(s) for this package.`);
       isValid = false;
-    } if (!petName) { setPetNameError("Pet Name is required."); isValid = false; }
-    if (!petBreed) { setPetBreedError("Pet Breed is required."); isValid = false; }
-    if (!address || !selectedCity) { setAddressError("Address and City are required."); isValid = false; }
+      if (!nameError && !phoneNumberError && !emailError && !startDateError) preferredDaysRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (!petName) {
+      setPetNameError("Pet Name is required.");
+      isValid = false;
+      if (!nameError && !phoneNumberError && !emailError && !startDateError && !preferredDaysError) petNameRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (!petBreed) {
+      setPetBreedError("Pet Breed is required.");
+      isValid = false;
+      if (!nameError && !phoneNumberError && !emailError && !startDateError && !preferredDaysError && !petNameError) petBreedRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    if (!address || !selectedCity) {
+      setAddressError("Address and City are required.");
+      isValid = false;
+      if (!nameError && !phoneNumberError && !emailError && !startDateError && !preferredDaysError && !petNameError && !petBreedError) {
+        if (!selectedCity) cityRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        else addressRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
 
     if (!isValid) return;
 
@@ -180,13 +209,14 @@ const TrainingBookingForm: React.FC = () => {
         packagePrice: price,
         userId: user.id,
         bookingType: "training",
-        sessionsPerWeek, // Added
+        sessionsPerWeek,
       };
 
       sessionStorage.setItem("formData", JSON.stringify(newBooking));
       router.push("/services/payment");
     }
   };
+
   return (
     <div className="min-h-screen bg-gray-100 py-6 flex items-center justify-center">
       <Toaster position="top-center" />
@@ -203,21 +233,22 @@ const TrainingBookingForm: React.FC = () => {
           )}
 
           <div>
-            <label className="block text-sm font-medium text-gray-700">Pet Type</label>
-            <select
-              value={petType}
-              onChange={(e) => setPetType(e.target.value)}
-              className="mt-1 p-2 w-full border border-gray-300 rounded-md bg-gray-100 cursor-not-allowed"
-              disabled
-            >
-              <option value="Dog">Dog</option>
-              <option value="Cat">Cat</option>
-            </select>
+            <label htmlFor="petType" className="block text-sm font-medium text-gray-700" style={{ fontWeight: '500', fontSize: '1rem' }}>
+              Pet Type
+            </label>
+            <input
+              type="text"
+              id="petType"
+              value={petType || 'Select a package first'}
+              readOnly
+              className="mt-1 p-2 w-full border border-gray-300 rounded-md bg-gray-100 text-gray-700 cursor-not-allowed"
+            />
           </div>
 
           <div>
             <label className="block text-sm font-medium text-gray-700">Pet Name</label>
             <input
+              ref={petNameRef}
               type="text"
               value={petName}
               onChange={(e) => setPetName(e.target.value)}
@@ -227,7 +258,7 @@ const TrainingBookingForm: React.FC = () => {
             {petNameError && <p className="text-red-500 text-xs italic">{petNameError}</p>}
           </div>
 
-          <div>
+          <div ref={petBreedRef}>
             <label className="block text-sm font-medium text-gray-700">Pet Breed</label>
             <Select
               value={breedOptions.find((option) => option.value === petBreed)}
@@ -293,6 +324,7 @@ const TrainingBookingForm: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Your Name</label>
             <input
+              ref={nameRef}
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -305,6 +337,7 @@ const TrainingBookingForm: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Phone Number</label>
             <input
+              ref={phoneNumberRef}
               type="tel"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
@@ -317,6 +350,7 @@ const TrainingBookingForm: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Your Email</label>
             <input
+              ref={emailRef}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -326,7 +360,7 @@ const TrainingBookingForm: React.FC = () => {
             {emailError && <p className="text-red-500 text-xs italic">{emailError}</p>}
           </div>
 
-          <div>
+          <div ref={cityRef}>
             <label className="block text-sm font-medium text-gray-700">Select Your City</label>
             <Select
               value={selectedCity}
@@ -340,6 +374,7 @@ const TrainingBookingForm: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Your Address</label>
             <input
+              ref={addressRef}
               type="text"
               value={address}
               onChange={(e) => setAddress(e.target.value)}
@@ -352,6 +387,7 @@ const TrainingBookingForm: React.FC = () => {
           <div>
             <label className="block text-sm font-medium text-gray-700">Start Date</label>
             <DatePicker
+              // ref={startDateRef}
               selected={startDate}
               onChange={(date) => setStartDate(date)}
               dateFormat="MMMM d, yyyy"
@@ -363,7 +399,7 @@ const TrainingBookingForm: React.FC = () => {
           </div>
 
           {startDate && (
-            <div>
+            <div ref={preferredDaysRef}>
               <label className="block text-sm font-medium text-gray-700">
                 Preferred Days (Select exactly {sessionsPerWeek})
               </label>
@@ -385,9 +421,7 @@ const TrainingBookingForm: React.FC = () => {
                   </button>
                 ))}
               </div>
-              {preferredDaysError && (
-                <p className="text-red-500 text-xs italic">{preferredDaysError}</p>
-              )}
+              {preferredDaysError && <p className="text-red-500 text-xs italic">{preferredDaysError}</p>}
             </div>
           )}
 
