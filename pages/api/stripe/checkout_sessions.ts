@@ -1,4 +1,4 @@
-//pages/api/stripe/checkout_session.ts
+// //pages/api/stripe/checkout_session.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 
@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     const { formData } = req.body;
     console.log('Received formData in checkout_sessions:', formData);
 
-    if (!formData || !formData.packageTitle || !formData.packagePrice || !formData.bookingType || !formData.userId) {
+    if (!formData || !formData.packageTitle || (!formData.packagePrice && !formData.totalCost) || !formData.bookingType || !formData.userId) {
       console.error('Invalid or missing formData:', formData);
       return res.status(400).json({ error: 'Missing required formData fields' });
     }
@@ -37,6 +37,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     console.log('Metadata prepared:', metadata);
 
+    const price = formData.totalCost || formData.packagePrice; // Use totalCost for walking, packagePrice for others
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -46,13 +47,13 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             product_data: {
               name: formData.packageTitle,
             },
-            unit_amount: parseInt(formData.packagePrice.replace('₹', '')) * 100,
+            unit_amount: parseInt(price.replace('₹', '')) * 100,
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${req.headers.origin}/services/confirmation?packageTitle=${encodeURIComponent(formData.packageTitle)}&packagePrice=${encodeURIComponent(formData.packagePrice)}&paymentMethod=Stripe`,
+      success_url: `${req.headers.origin}/services/confirmation?packageTitle=${encodeURIComponent(formData.packageTitle)}&packagePrice=${encodeURIComponent(price)}&paymentMethod=Stripe`,
       cancel_url: `${req.headers.origin}/services/payment`,
       metadata,
     });

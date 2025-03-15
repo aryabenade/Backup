@@ -1,4 +1,4 @@
-// Path: app/services/payment/page.tsx
+// // Path: app/services/payment/page.tsx
 "use client";
 
 import { useSearchParams, useRouter } from 'next/navigation';
@@ -6,6 +6,7 @@ import React, { useState, useEffect } from 'react';
 import { storeGroomingBooking } from '@/app/services/grooming/groomingBooking';
 import { storeVetBooking } from '@/app/services/vet/vetBooking';
 import { storeTrainingBooking } from '@/app/services/training/trainingBooking';
+import { storeWalkingBooking } from '@/app/services/walking/walkingBooking';
 import { useUser } from '@clerk/nextjs';
 import { BeatLoader } from 'react-spinners';
 import axios from 'axios';
@@ -53,18 +54,27 @@ const Payment: React.FC = () => {
       let response;
       if (formData.bookingType === 'grooming') {
         response = await storeGroomingBooking(dataWithUserId);
-        await axios.post('/api/sendGroomingEmail', { bookingId: response.id });
+        // await axios.post('/api/sendGroomingEmail', { bookingId: response.id });
       } else if (formData.bookingType === 'vet') {
         response = await storeVetBooking(dataWithUserId);
-        await axios.post('/api/sendVetEmail', { bookingId: response.id });
+        // await axios.post('/api/sendVetEmail', { bookingId: response.id });
       } else if (formData.bookingType === 'training') {
         response = await storeTrainingBooking(dataWithUserId);
+      } else if (formData.bookingType === 'walking') {
+        response = await storeWalkingBooking(dataWithUserId);
+        // await axios.post('/api/sendWalkingEmail', { bookingId: response.id }); // Optional email
+      } else {
+        throw new Error('Unknown booking type');
       }
 
       if (response) {
         console.log('PayAfterService booking stored:', response);
         sessionStorage.removeItem('formData');
-        router.push(`/services/confirmation?packageTitle=${encodeURIComponent(formData.packageTitle)}&packagePrice=${encodeURIComponent(formData.packagePrice)}&paymentMethod=PayAfterService`);
+        router.push(`/services/confirmation?packageTitle=${encodeURIComponent(
+          formData.packageTitle || 'Walking Package'
+        )}&packagePrice=${encodeURIComponent(
+          formData.totalCost || formData.packagePrice // Use totalCost for walking
+        )}&paymentMethod=PayAfterService`);
       } else {
         setError('Failed to process the booking.');
       }
@@ -127,10 +137,10 @@ const Payment: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-gray-700">Package Details</label>
               <div className="mt-1 p-2 w-full border border-gray-300 rounded-md">
-                <p>Package Name: {formData.packageTitle}</p>
-                <p>Package Price: {formData.packagePrice}</p>
+                <p>Package Name: {formData.packageTitle || 'Walking Package'}</p>
+                <p>Package Price: {formData.totalCost || formData.packagePrice}</p>
                 <p>Tax: Inclusive in package</p>
-                <p>Total: {formData.packagePrice}</p>
+                <p>Total: {formData.totalCost || formData.packagePrice}</p>
               </div>
             </div>
 

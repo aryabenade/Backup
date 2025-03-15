@@ -1,10 +1,11 @@
-//pages/api/stripe/webhook.ts
+// //pages/api/stripe/webhook.ts
 import type { NextApiRequest, NextApiResponse } from 'next';
 import Stripe from 'stripe';
 import { buffer } from 'micro';
 import { storeGroomingBooking } from '@/app/services/grooming/groomingBooking';
 import { storeVetBooking } from '@/app/services/vet/vetBooking';
 import { storeTrainingBooking } from '@/app/services/training/trainingBooking';
+import { storeWalkingBooking } from '@/app/services/walking/walkingBooking'; // Add walking import
 import axios from 'axios';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
@@ -72,82 +73,101 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       return res.status(400).json({ error: 'Missing formData in metadata' });
     }
 
-    // Validate required fields based on bookingType
-   // Define required fields based on bookingType
-let requiredFields: string[];
-if (bookingType === 'vet') {
-  requiredFields = [
-    'name',
-    'phoneNumber',
-    'email',
-    'date',
-    'timeSlot',
-    'consultationType',
-    'petType',
-    'medicalAttention',
-    'packageTitle',
-    'packagePrice',
-    'userId',
-  ];
-  // Conditionally require city and address for Home Consultation
-  if (formData.consultationType === 'Home Consultation') {
-    requiredFields.push('city', 'address');
-  }
-} else if (bookingType === 'grooming') {
-  requiredFields = [
-    'name',
-    'phoneNumber',
-    'email',
-    'date',
-    'timeSlot',
-    'petType',
-    'petName',
-    'petBreed',
-    'city',
-    'address',
-    'packageTitle',
-    'packagePrice',
-    'userId',
-  ];
-} else if (bookingType === 'training') {
-  requiredFields = [
-    'name',
-    'phoneNumber',
-    'email',
-    'startDate',
-    'preferredDays',
-    'petType',
-    'petName',
-    'petBreed',
-    'city',
-    'address',
-    'packageTitle',
-    'packagePrice',
-    'userId',
-    'sessionsPerWeek',
-  ];
-} else {
-  requiredFields = [];
-}
+    // Define required fields based on bookingType
+    let requiredFields: string[];
+    if (bookingType === 'vet') {
+      requiredFields = [
+        'name',
+        'phoneNumber',
+        'email',
+        'date',
+        'timeSlot',
+        'consultationType',
+        'petType',
+        'medicalAttention',
+        'packageTitle',
+        'packagePrice',
+        'userId',
+      ];
+      if (formData.consultationType === 'Home Consultation') {
+        requiredFields.push('city', 'address');
+      }
+    } else if (bookingType === 'grooming') {
+      requiredFields = [
+        'name',
+        'phoneNumber',
+        'email',
+        'date',
+        'timeSlot',
+        'petType',
+        'petName',
+        'petBreed',
+        'city',
+        'address',
+        'packageTitle',
+        'packagePrice',
+        'userId',
+      ];
+    } else if (bookingType === 'training') {
+      requiredFields = [
+        'name',
+        'phoneNumber',
+        'email',
+        'startDate',
+        'preferredDays',
+        'petType',
+        'petName',
+        'petBreed',
+        'city',
+        'address',
+        'packageTitle',
+        'packagePrice',
+        'userId',
+        'sessionsPerWeek',
+      ];
+    } else if (bookingType === 'walking') {
+      requiredFields = [
+        'name',
+        'phoneNumber',
+        'email',
+        'startDate',
+        'endDate',
+        'timeSlot',
+        'daysOfWeek',
+        'walkDuration',
+        'petType',
+        'petName',
+        'petBreed',
+        'city',
+        'address',
+        'totalWalks',
+        'totalCost',
+        'userId',
+        'packageTitle',
+      ];
+    } else {
+      requiredFields = [];
+    }
 
-const missingFields = requiredFields.filter(field => !formData[field]);
-if (missingFields.length > 0) {
-  console.error('Missing required fields:', missingFields);
-  return res.status(400).json({ error: `Missing required fields: ${missingFields.join(', ')}` });
-}
+    const missingFields = requiredFields.filter(field => !formData[field]);
+    if (missingFields.length > 0) {
+      console.error('Missing required fields:', missingFields);
+      return res.status(400).json({ error: `Missing required fields: ${missingFields.join(', ')}` });
+    }
+
     try {
       let response;
       if (bookingType === 'grooming') {
         console.log('Storing grooming booking with data:', formData);
         response = await storeGroomingBooking(formData);
         console.log('Grooming booking stored:', response);
-        await axios.post('/api/sendGroomingEmail', { bookingId: response.id });
+        // await axios.post('/api/sendGroomingEmail', { bookingId: response.id });
         console.log('Grooming email sent for booking ID:', response.id);
       } else if (bookingType === 'vet') {
         console.log('Storing vet booking with data:', formData);
         response = await storeVetBooking(formData);
         console.log('Vet booking stored:', response);
-        await axios.post('/api/sendVetEmail', { bookingId: response.id });
+        // await axios.post('/api/sendVetEmail', { bookingId: response.id });
         console.log('Vet email sent for booking ID:', response.id);
       } else if (bookingType === 'training') {
         console.log('Storing training booking with data:', formData);
@@ -155,7 +175,12 @@ if (missingFields.length > 0) {
         console.log('Training booking stored:', response);
         // Uncomment when training email API is implemented
         // await axios.post('/api/sendTrainingEmail', { bookingId: response.id });
-        // console.log('Training email sent for booking ID:', response.id);
+      } else if (bookingType === 'walking') {
+        console.log('Storing walking booking with data:', formData);
+        response = await storeWalkingBooking(formData);
+        console.log('Walking booking stored:', response);
+        // Uncomment when walking email API is implemented
+        // await axios.post('/api/sendWalkingEmail', { bookingId: response.id });
       } else {
         console.log('Unknown booking type:', bookingType);
         return res.status(400).json({ error: `Unknown booking type: ${bookingType}` });

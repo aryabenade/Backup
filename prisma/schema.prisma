@@ -57,22 +57,32 @@ model Pet {
   favorites        Favorite[]
 }
 
-// model AdoptionRequest {
-//   id            Int      @id @default(autoincrement())
-//   petId         Int
-//   adopterId     String
-//   fullName      String
-//   phoneNumber   String
-//   emailAddress  String
-//   residenceType String
-//   state         String
-//   city          String
-//   profileImage  String?  // Add this field, nullable
-//   createdAt     DateTime @default(now())
-//   updatedAt     DateTime @updatedAt
-
-//   pet Pet @relation(fields: [petId], references: [id])
-// }
+model WalkingBooking {
+  id             Int      @id @default(autoincrement())
+  name           String
+  phoneNumber    String
+  email          String
+  startDate      DateTime
+  endDate        DateTime
+  timeSlot       String   // e.g., "7:00 AM - 8:00 AM"
+  daysOfWeek     String   // e.g., "Mon,Tue,Wed"
+  walkDuration   String   // "30 mins", "1 hour"
+  petType        String   // "Dog"
+  petName        String
+  petBreed       String
+  petGender      String
+  energyLevel    String   // "Low", "Medium", "High"
+  leashBehavior  String   // "Good", "Pulls", "Needs Work"
+  petAge         String
+  city           String
+  address        String
+  totalWalks     Int      // Calculated based on schedule
+  walksCompleted Int      @default(0)
+  totalCost      String   // e.g., "₹3000"
+  status         String   @default("Scheduled")
+  userId         String
+  packageTitle   String   // e.g., "30-Minute Walks" or "1-Hour Walks"
+}
 
 model AdoptionRequest {
   id                  Int      @id @default(autoincrement())

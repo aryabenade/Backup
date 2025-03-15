@@ -223,3 +223,55 @@ export interface NewTrainingBookingData {
   userId: string;
   sessionsPerWeek: number;   // Added
 }
+
+// app/types.ts
+export interface WalkingBookingData {
+  id: number;
+  name: string;
+  phoneNumber: string;
+  email: string;
+  startDate: Date;
+  endDate: Date;
+  timeSlot: string;
+  daysOfWeek: string[];
+  walkDuration: string;
+  petType: string;
+  petName: string;
+  petBreed: string;
+  petGender: string;
+  energyLevel: string;
+  leashBehavior: string;
+  petAge: string;
+  city: string;
+  address: string;
+  totalWalks: number;
+  walksCompleted: number;
+  totalCost: string;
+  status: string;
+  userId: string;
+  packageTitle: string; // Added
+}
+
+export interface NewWalkingBookingData {
+  name: string;
+  phoneNumber: string;
+  email: string;
+  startDate: Date;
+  endDate: Date;
+  timeSlot: string;
+  daysOfWeek: string[];
+  walkDuration: string;
+  petType: string;
+  petName: string;
+  petBreed: string;
+  petGender: string;
+  energyLevel: string;
+  leashBehavior: string;
+  petAge: string;
+  city: string;
+  address: string;
+  totalWalks: number;
+  totalCost: string;
+  userId: string;
+  packageTitle: string; // Added
+}

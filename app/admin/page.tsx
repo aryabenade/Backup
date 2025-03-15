@@ -57,6 +57,11 @@ const AdminDashboard: React.FC = () => {
               Training Requests
             </div>
           </Link>
+          <Link href="/admin/walking">
+            <div className="block bg-gray-300 text-black text-center py-1 text-lg font-bold rounded-md hover:bg-gray-400 transition duration-300 cursor-pointer mb-2">
+              Walking Requests
+            </div>
+          </Link>
         </div>
       </div>
     </div>
